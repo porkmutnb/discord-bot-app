@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, ActionRowBuilder, ActivityType, ButtonBuilder, ButtonStyle, Events } = require('discord.js');
+const { Client, GatewayIntentBits, ActionRowBuilder, ActivityType, ButtonBuilder, ButtonStyle, Events, EmbedBuilder } = require('discord.js');
 const { config } = require('dotenv').config();
 const client = new Client({ 
     intents: [
@@ -9,34 +9,48 @@ const client = new Client({
     ] 
 });
 
-const WELCOME_ID = process.env.WELCOME_ID;
-const GOODBYE_ID = process.env.GOODBYE_ID;
+const CH_WELCOME_ID = process.env.CH_WELCOME_ID;
+const CH_GOODBYE_ID = process.env.CH_GOODBYE_ID;
 
 client.on('ready', () => {
-    client.user.setActivity('Fond is working', { type: ActivityType.Listening });
+    client.user.setActivity('> Fond is working', { type: ActivityType.Listening });
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
 client.on('messageCreate', (context) => {
-    console.log('context', context);
     if(context.author.bot) {
         return;
     }
     if(context.content.startsWith('>')) {
+        console.log('context', context);
         if(context.content.toLowerCase() === '>fond') {
-            context.reply('เรียกหนูทำไมคะ, คิดถึงหนูหรอ');
+            context.reply('เรียกหนูทำไมคะ, คิดถึงหนูหรอ').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
         }
     }
 })
 
 client.on('guildMemberAdd', (context) => {
     console.log('guildMemberAdd', context);
-    context.guild.channels.cache.find(i => i.id === WELCOME_ID).send(`Welcome ${context.user} to server: ${context.guild.name}.`); 
+    const embed = new EmbedBuilder()
+                        .setColor(0xC995C1)
+                        .setTitle(`${context.guild.name}`)
+                        .setDescription(`Welcome ${context.user} to server: ${context.guild.name}.`)
+                        .setTimestamp()
+                        .setFooter({ text: `Powered by @cherMew` });
+    context.guild.channels.cache.find(i => i.id == CH_WELCOME_ID).send({ embeds: [embed] });
+    // context.guild.channels.cache.find(i => i.id === CH_WELCOME_ID).send(`Welcome ${context.user} to server: ${context.guild.name}.`);
 })
 
 client.on('guildMemberRemove', (context) => {
     console.log('guildMemberRemove', context);
-    context.guild.channels.cache.find(i => i.id === GOODBYE_ID).send(`GoodBye ${context.user}, Good luck of your path.`); 
+    const embed = new EmbedBuilder()
+                        .setColor(0x3AC1B0)
+                        .setTitle(`${context.guild.name}`)
+                        .setDescription(`GoodBye ${context.user}, Good luck of your path.`)
+                        .setTimestamp()
+                        .setFooter({ text: `Powered by @cherMew` });
+    context.guild.channels.cache.find(i => i.id == CH_GOODBYE_ID).send({ embeds: [embed] });
+    // context.guild.channels.cache.find(i => i.id === CH_GOODBYE_ID).send(`GoodBye ${context.user}, Good luck of your path.`); 
 })
 
 client.login(process.env.TOKEN);
