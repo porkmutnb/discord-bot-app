@@ -24,7 +24,7 @@ const client = new Client({
 });
 
 client.on('ready', () => {
-    client.user.setActivity('! Pupe is working', { type: ActivityType.Listening });
+    client.user.setActivity('! Pupe is watching', { type: ActivityType.Watching });
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
@@ -103,11 +103,9 @@ client.on('messageCreate', (context) => {
                 context.guild.channels.cache.find(i => i.id === CH_INTRODUCTION_ID).send({ embeds: [embed] });
             }
         }else {
-            context.reply('อิชั้นขอลบ, โพสต์ที่อิชั้นไม่เข้าใจนะคะนายท่าน').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
+            context.reply('อิชั้นขอลบโพสต์, ที่อิชั้นไม่เข้าใจนะคะนายท่าน').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
         }
-        if(context.content.toLowerCase() === '!setup' || context.author.id != OWNER_ID) {
-            setTimeout(() => context.delete(), 2000 );
-        }
+        setTimeout(() => context.delete(), 2000 );
     }else {
         if(context.channelId === CH_INTRODUCTION_ID) {
             context.delete(5000);
