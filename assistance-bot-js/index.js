@@ -1,10 +1,14 @@
 const { Client, GatewayIntentBits, ActionRowBuilder, ActivityType, ButtonBuilder, ButtonStyle, 
-        Events, ModalBuilder, TextInputBuilder, TextInputStyle, EmbedBuilder
+        Events, ModalBuilder, TextInputBuilder, TextInputStyle, EmbedBuilder, StringSelectMenuBuilder
 } = require('discord.js');
+const { Modal, TextInputComponent, SelectMenuComponent } = require('discord-modals');
 const { config } = require('dotenv').config();
 
 const MEMBER_ID = process.env.MEMBER_ID
 const GAMER_ID = process.env.GAMER_ID
+const MC_GAMER_ID = process.env.MC_GAME_ID
+const RDR_GAMER_ID = process.env.RDR_GAME_ID
+const GTA_GAMER_ID = process.env.GTA_GAME_ID
 const OTA_ID = process.env.OTA_ID
 const FRIEND_ID = process.env.FRIEND_ID
 
@@ -30,87 +34,88 @@ client.on('ready', () => {
 
 client.on('messageCreate', (context) => {
     if(context.author.bot) {
-        return;
-    }
-    if(context.channelId === CH_INTRODUCTION_ID) {
-        console.log('context', context);
-        if(context.content.startsWith('!') || context.content.startsWith('>')) {
-            if(context.content.toLowerCase() === '!ping') {
-                context.reply('pong').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
-            }else if(context.content.toLowerCase() === '!invite') {
-                let invite = context.channel.createInvite(
-                    {
-                        maxAge: 24 * 3600, // maximum time for the invite, in milliseconds
-                        maxUses: 5 // maximum times it can be used
-                    },
-                    `Requested with command by ${context.author.tag}`
-                ).then(invite => {
-                    let linkInvite = `https://discord.gg/${invite.code}`
-                    context.author.send(`คำชวนเข้าเซิฟของ ${context.guild.name} => ${linkInvite}`);
-                });
-            }else if(context.content.toLowerCase() === '!role') {
-                let isUserMemberRole = context.member.roles.cache.has(MEMBER_ID);
-                const Member = new ActionRowBuilder()
-                                .addComponents(
-                                    new ButtonBuilder()
-                                        .setCustomId('member')
-                                        .setLabel('Member')
-                                        .setDisabled(isUserMemberRole ? true : false)
-                                        .setStyle(ButtonStyle.Primary),
-                );
-                let isUserGamerRole = context.member.roles.cache.has(GAMER_ID);
-                const Gamer = new ActionRowBuilder()
-                                .addComponents(
-                                    new ButtonBuilder()
-                                        .setCustomId('gamer')
-                                        .setLabel('Gamer')
-                                        .setDisabled(isUserGamerRole ? true : false)
-                                        .setStyle(ButtonStyle.Secondary),
-                );
-                let isUserOtaRole = context.member.roles.cache.has(OTA_ID);
-                const Ota = new ActionRowBuilder()
-                                .addComponents(
-                                    new ButtonBuilder()
-                                        .setCustomId('ota')
-                                        .setLabel('OTA')
-                                        .setDisabled(isUserOtaRole ? true : false)
-                                        .setStyle(ButtonStyle.Success),
-                );
-                let isUserFriendRole = context.member.roles.cache.has(FRIEND_ID);
-                const Friend = new ActionRowBuilder()
-                                .addComponents(
-                                    new ButtonBuilder()
-                                        .setCustomId('friend')
-                                        .setLabel('Friend')
-                                        .setDisabled(isUserFriendRole ? true : false)
-                                        .setStyle(ButtonStyle.Danger),
-                );
-                context.reply({ content: 'ต้องการ Role หรือคะ นายท่าน,', components: [Member,Gamer,Ota, Friend] }).then(msg => { setTimeout(() => msg.delete(), 10000 ) });
-            }else if(context.content.toLowerCase() === '!pupe') {
-                context.reply('เรียกอิชั้นทำไมคะนายท่าน, คิดถึงชั้นหรอ').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
-            }else if(context.content.toLowerCase() === '!setup' && context.author.id == OWNER_ID) {
-                const embed = new EmbedBuilder()
-                        .setColor(0xC995C1)
-                        .setTitle('คำสั่งของดิชั้นนะคะ')
-                        .setDescription('Command for Assistance')
-                        .addFields(
-                            { name: '!role', value: 'ต้องการ Rold' },
-                            { name: '!invite', value: 'ต้องการ Invite your friend' },
-                            { name: '!pupe', value: 'คุยกับดิชั้น' },
-                        )
-                        .setTimestamp()
-                        .setFooter({ text: `Powered by @cherMew` });
-                context.guild.channels.cache.find(i => i.id === CH_INTRODUCTION_ID).send({ embeds: [embed] });
-            }
-        }else {
-            context.reply('อิชั้นขอลบโพสต์, ที่อิชั้นไม่เข้าใจนะคะนายท่าน').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
-        }
-        setTimeout(() => context.delete(), 2000 );
+        
     }else {
         if(context.channelId === CH_INTRODUCTION_ID) {
-            context.delete(5000);
+            console.log('context', context);
+            if(context.content.startsWith('!')) {
+                if(context.content.toLowerCase() === '!ping') {
+                    context.reply('pong').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
+                }else if(context.content.toLowerCase() === '!invite') {
+                    context.channel.createInvite(
+                        {
+                            maxAge: 24 * 3600, // maximum time for the invite, in milliseconds
+                            maxUses: 5 // maximum times it can be used
+                        },
+                        `Requested with command by ${context.author.tag}`
+                    ).then(invite => {
+                        let linkInvite = `https://discord.gg/${invite.code}`
+                        context.author.send(`คำชวนเข้าเซิฟของ ${context.guild.name} => ${linkInvite}`);
+                    });
+                }else if(context.content.toLowerCase() === '!role') {
+                    let isUserMemberRole = context.member.roles.cache.has(MEMBER_ID);
+                    const Member = new ActionRowBuilder()
+                                    .addComponents(
+                                        new ButtonBuilder()
+                                            .setCustomId('member')
+                                            .setLabel('Member')
+                                            .setDisabled(isUserMemberRole ? true : false)
+                                            .setStyle(ButtonStyle.Primary),
+                    );
+                    let isUserGamerAllRole = context.member.roles.cache.has(GAMER_ID);
+                    let isUserGamerMCRole = context.member.roles.cache.has(MC_GAMER_ID);
+                    let isUserGamerRDRRole = context.member.roles.cache.has(RDR_GAMER_ID);
+                    let isUserGamerGTARole = context.member.roles.cache.has(GTA_GAMER_ID);
+                    let isUserGamerRole = isUserGamerAllRole && isUserGamerMCRole && isUserGamerRDRRole && isUserGamerGTARole;
+                    const Gamer = new ActionRowBuilder()
+                                    .addComponents(
+                                        new ButtonBuilder()
+                                            .setCustomId('gamer')
+                                            .setLabel('Gamer')
+                                            .setDisabled(isUserGamerRole ? true : false)
+                                            .setStyle(ButtonStyle.Secondary),
+                    );
+                    let isUserOtaRole = context.member.roles.cache.has(OTA_ID);
+                    const Ota = new ActionRowBuilder()
+                                    .addComponents(
+                                        new ButtonBuilder()
+                                            .setCustomId('ota')
+                                            .setLabel('OTA')
+                                            .setDisabled(isUserOtaRole ? true : false)
+                                            .setStyle(ButtonStyle.Success),
+                    );
+                    let isUserFriendRole = context.member.roles.cache.has(FRIEND_ID);
+                    const Friend = new ActionRowBuilder()
+                                    .addComponents(
+                                        new ButtonBuilder()
+                                            .setCustomId('friend')
+                                            .setLabel('Friend')
+                                            .setDisabled(isUserFriendRole ? true : false)
+                                            .setStyle(ButtonStyle.Danger),
+                    );
+                    context.reply({ content: 'ต้องการ Role หรือคะ นายท่าน,', components: [Member,Gamer,Ota, Friend] }).then(msg => { setTimeout(() => msg.delete(), 10000 ) });
+                }else if(context.content.toLowerCase() === '!pupe') {
+                    context.reply('เรียกอิชั้นทำไมคะนายท่าน, คิดถึงชั้นหรอ').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
+                }else if(context.content.toLowerCase() === '!setup' && context.author.id == OWNER_ID) {
+                    const embed = new EmbedBuilder()
+                            .setColor(0xC995C1)
+                            .setTitle('คำสั่งของดิชั้นนะคะ')
+                            .setDescription('Command for Assistance')
+                            .addFields(
+                                { name: '!role', value: 'ต้องการ Rold' },
+                                { name: '!invite', value: 'ต้องการ Invite your friend' },
+                                { name: '!pupe', value: 'คุยกับดิชั้น' },
+                            )
+                            .setTimestamp()
+                            .setFooter({ text: `Powered by @cherMew` });
+                    context.guild.channels.cache.find(i => i.id === CH_INTRODUCTION_ID).send({ embeds: [embed] });
+                }
+                setTimeout(() => context.delete(), 5000 );
+            }else {
+                // context.reply('อิชั้นขอลบโพสต์, ที่อิชั้นไม่เข้าใจนะคะนายท่าน').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
+            }
+            // setTimeout(() => context.delete(), 5000 );
         }
-        
     }
 })
 
@@ -121,30 +126,34 @@ client.on(Events.InteractionCreate, async interaction => {
         let isUserMemberRole = interaction.member.roles.cache.has(memberRole.id);
         if (memberRole && !isUserMemberRole) {
             interaction.guild.members.cache.get(interaction.member.user.id).roles.add(memberRole);
-            interaction.reply(`${interaction.member.user}เพิ่ม Role MEMBER ให้นายท่านเรียบร้อยแล้วค่ะ`).then(msg => { setTimeout(() => msg.delete(), 5000 ) });
+            interaction.reply(`${interaction.member.user}เพิ่ม Role MEMBER ให้นายท่านเรียบร้อยแล้วค่ะ`);
         }else {
             return;
         }
     }else if(interaction.customId === 'gamer') {
-        let gamerRole = interaction.member.guild.roles.cache.find(role => role.name === "GAMER");
-        let isUserGamerRole = interaction.member.roles.cache.has(gamerRole.id);
-        if (gamerRole && !isUserGamerRole) {
-            interaction.guild.members.cache.get(interaction.member.user.id).roles.add(gamerRole);
-            interaction.reply(`${interaction.member.user} เพิ่ม Role GAMER ให้นายท่านเรียบร้อยแล้วค่ะ`).then(msg => { setTimeout(() => msg.delete(), 5000 ) });
-        }else {
-            return;
-        }
+        const modal = new ModalBuilder()
+                        .setCustomId('gameRequest')
+                        .setTitle('แบบสอบถาม');
+        const gameInput = new TextInputBuilder()
+                        .setCustomId('gameInput')
+                        .setLabel("คุณเล่นเกมอะไร?")
+                        .setPlaceholder("Ex. [GTA, RDR, MINECRAFT, Other]")
+                        .setStyle(TextInputStyle.Paragraph)
+                        .setRequired(true);
+        const firstActionRow = new ActionRowBuilder().addComponents(gameInput);
+        modal.addComponents(firstActionRow);
+        await interaction.showModal(modal);
     }else if(interaction.customId === 'friend') {
         const acceptFriend = new ActionRowBuilder()
                         .addComponents(
                             new ButtonBuilder()
                                 .setCustomId('acceptFriend')
                                 .setLabel('Accept Friend')
-                                .setDisabled(false)
+                                .setDisabled(true)
                                 .setStyle(ButtonStyle.Primary),
         );
         interaction.guild.channels.cache.find(i => i.id === CH_REQUEST_FRIEND_ID).send({ content: `มีสมาชิกท่านนี้ ${interaction.member.user}, แจ้งว่ารู้จักคุณ โปรดพิจารณา.`, components: [acceptFriend] });
-        interaction.reply(`${interaction.member.user} รอ Owner อนุมัติการเพิ่ม Role FRIEND ให้นายท่านสักครู่นะคะ`).then(msg => { setTimeout(() => msg.delete(), 5000 ) });
+        interaction.reply(`${interaction.member.user} รอ Owner อนุมัติการเพิ่ม Role FRIEND ให้นายท่านสักครู่นะคะ`);
     }else if(interaction.customId === 'ota') {
         const modal = new ModalBuilder()
 			.setCustomId('otaRequest')
@@ -166,7 +175,7 @@ client.on(Events.InteractionCreate, async interaction => {
     } else if(interaction.customId === 'acceptFriend') {
         console.log('acceptFriend', interaction.member.user);
         let userId = interaction.message.content.substring(interaction.message.content.indexOf('@')+1, interaction.message.content.indexOf('>'))
-        let friendRole = interaction.member.guild.roles.cache.find(role => role.name === "FRIEND");
+        let friendRole = interaction.member.guild.roles.cache.find(role => role.id === FRIEND_ID);
         let isUserFriendRole = interaction.member.roles.cache.has(userId);
         if (friendRole && !isUserFriendRole) {
             console.log(client.users.cache.filter(u => u.id === userId));
@@ -188,7 +197,31 @@ client.on(Events.InteractionCreate, async interaction => {
                 interaction.guild.members.cache.get(interaction.member.user.id).setNickname(nameInput+'|'+oshiInput);
                 interaction.reply(`${interaction.member.user} เพิ่ม Role OTA ให้นายท่านเรียบร้อยแล้วค่ะ`).then(msg => { setTimeout(() => msg.delete(), 5000 ) });
             }else {
-                interaction.reply(`${interaction.member.user} นายท่านคะ, พอดีระบบมีปัญหา รบกวนนายท่านกดอีกรอบนะเจ้าคะ`).then(msg => { setTimeout(() => msg.delete(), 5000 ) });
+                interaction.reply(`${interaction.member.user} นายท่านคะ, พอดีระบบมีปัญหา รบกวนนายท่านกดอีกรอบนะเจ้าคะ`).then(msg => { setTimeout(() => msg.delete(), 2000 ) });
+            }
+        }else if(interaction.customId === 'gameRequest') {
+            let gameOption = interaction.fields.getTextInputValue('gameInput');
+            let gameRole = "";
+            switch (gameOption.toUpperCase()) {
+                case "MINECRAFT":
+                    gamerRole = interaction.member.guild.roles.cache.find(role => role.id === MC_GAMER_ID);
+                    break;
+                case "RDR":
+                    gamerRole = interaction.member.guild.roles.cache.find(role => role.id === RDR_GAMER_ID);
+                    break;
+                case "GTA":
+                    gamerRole = interaction.member.guild.roles.cache.find(role => role.id === GTA_GAMER_ID);
+                    break;
+                default:
+                    gamerRole = interaction.member.guild.roles.cache.find(role => role.id === GAMER_ID);
+                    break;
+            }
+            let isUserGamerRole = interaction.member.roles.cache.has(gameRole.id);
+            if (gamerRole && !isUserGamerRole) {
+                interaction.guild.members.cache.get(interaction.member.user.id).roles.add(gamerRole);
+                interaction.reply(`${interaction.member.user} เพิ่ม Role ${gameOption} ให้นายท่านเรียบร้อยแล้วค่ะ`);
+            }else {
+                return;
             }
         }
     }

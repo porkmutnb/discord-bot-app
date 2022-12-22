@@ -30,6 +30,9 @@ client.on('messageCreate', (context) => {
 })
 
 client.on('guildMemberAdd', (context) => {
+    if(context.user.bot) {
+        return;
+    }
     console.log('guildMemberAdd', context);
     const embed = new EmbedBuilder()
                         .setColor(0xC995C1)
@@ -42,6 +45,9 @@ client.on('guildMemberAdd', (context) => {
 })
 
 client.on('guildMemberRemove', (context) => {
+    if(context.user.bot) {
+        return;
+    }
     console.log('guildMemberRemove', context);
     const embed = new EmbedBuilder()
                         .setColor(0x3AC1B0)
