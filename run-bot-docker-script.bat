@@ -1,0 +1,8 @@
+@ECHO OFF
+timeout /t 50
+docker start 5404b8eb489c4c9eb681126b70f4905f810a60b1ce61de2255469f75fb30e92c
+timeout /t 5
+docker start 063ce6bac55399cbd8197889605ec55839f321ba31f301aca5ccd58d10bf8759
+timeout /t 5
+docker start 48a5c8b77eb34084809f885e31ed65117e6cbec6c306ef4278a1a0d670af6d22
+exit

@@ -26,6 +26,7 @@ client.on('messageCreate', (context) => {
         if(context.content.toLowerCase() === '>fond') {
             context.reply('เรียกหนูทำไมคะ, คิดถึงหนูหรอ').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
         }
+        setTimeout(() => context.delete(), 3000)
     }
 })
 
