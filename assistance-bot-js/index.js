@@ -16,6 +16,7 @@ const CH_INTRODUCTION_ID = process.env.CH_INTRODUCTION_ID
 const CH_REQUEST_FRIEND_ID = process.env.CH_REQUEST_FRIEND_ID
 
 const OWNER_ID = process.env.OWNER_ID
+const ADMIN_ID = process.env.ADMIN_ID
 
 const client = new Client({ 
     intents: [
@@ -42,16 +43,23 @@ client.on('messageCreate', (context) => {
                 if(context.content.toLowerCase() === '!ping') {
                     context.reply('pong').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
                 }else if(context.content.toLowerCase() === '!invite') {
-                    context.channel.createInvite(
-                        {
-                            maxAge: 24 * 3600, // maximum time for the invite, in milliseconds
-                            maxUses: 5 // maximum times it can be used
-                        },
-                        `Requested with command by ${context.author.tag}`
-                    ).then(invite => {
-                        let linkInvite = `https://discord.gg/${invite.code}`
-                        context.author.send(`คำชวนเข้าเซิฟของ ${context.guild.name} => ${linkInvite}`);
-                    });
+                    let isUserMemberRole = context.member.roles.cache.has(MEMBER_ID);
+                    let isOwnerRole = context.member.roles.cache.has(OWNER_ID);
+                    let isAdminRole = context.member.roles.cache.has(ADMIN_ID);
+                    if(isUserMemberRole||isOwnerRole||isAdminRole) {
+                        context.channel.createInvite(
+                            {
+                                maxAge: 24 * 3600, // maximum time for the invite, in milliseconds
+                                maxUses: 5 // maximum times it can be used
+                            },
+                            `Requested with command by ${context.author.tag}`
+                        ).then(invite => {
+                            let linkInvite = `https://discord.gg/${invite.code}`
+                            context.author.send(`คำชวนเข้าเซิฟของ ${context.guild.name} => ${linkInvite}`);
+                        });
+                    }else {
+                        context.reply(`นายท่านไม่มีสิทธิใช้คำสั่งนี้นะคะ`).then(msg => { setTimeout(() => msg.delete(), 5000 ) });
+                    }
                 }else if(context.content.toLowerCase() === '!role') {
                     let isUserMemberRole = context.member.roles.cache.has(MEMBER_ID);
                     const Member = new ActionRowBuilder()
@@ -103,7 +111,7 @@ client.on('messageCreate', (context) => {
                             .setDescription('Command for Assistance')
                             .addFields(
                                 { name: '!role', value: 'ต้องการ Rold' },
-                                { name: '!invite', value: 'ต้องการ Invite your friend' },
+                                { name: '!invite', value: 'ต้องการ Invite your friend [only 𝓜𝓔𝓜𝓑𝓔𝓡]' },
                                 { name: '!pupe', value: 'คุยกับดิชั้น' },
                             )
                             .setTimestamp()
@@ -111,10 +119,7 @@ client.on('messageCreate', (context) => {
                     context.guild.channels.cache.find(i => i.id === CH_INTRODUCTION_ID).send({ embeds: [embed] });
                 }
                 setTimeout(() => context.delete(), 5000 );
-            }else {
-                // context.reply('อิชั้นขอลบโพสต์, ที่อิชั้นไม่เข้าใจนะคะนายท่าน').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
             }
-            // setTimeout(() => context.delete(), 5000 );
         }
     }
 })
@@ -122,7 +127,7 @@ client.on('messageCreate', (context) => {
 client.on(Events.InteractionCreate, async interaction => {
     console.log('interaction', interaction);
     if(interaction.customId === 'member') {
-        let memberRole = interaction.member.guild.roles.cache.find(role => role.name === "MEMBER");
+        let memberRole = interaction.member.guild.roles.cache.find(role => role.id === MEMBER_ID);
         let isUserMemberRole = interaction.member.roles.cache.has(memberRole.id);
         if (memberRole && !isUserMemberRole) {
             interaction.guild.members.cache.get(interaction.member.user.id).roles.add(memberRole);
@@ -190,7 +195,7 @@ client.on(Events.InteractionCreate, async interaction => {
             let nameInput = interaction.fields.getTextInputValue('nameInput');
             let oshiInput = interaction.fields.getTextInputValue('oshiInput');
             oshiInput = oshiInput.length>10 ? oshiInput.substring(0,9)+`...` : oshiInput;
-            let otaRole = interaction.member.guild.roles.cache.find(role => role.name === "OTA");
+            let otaRole = interaction.member.guild.roles.cache.find(role => role.id === OTA_ID);
             let isUserOtaRole = interaction.member.roles.cache.has(otaRole.id);
             if (otaRole && !isUserOtaRole) {
                 interaction.guild.members.cache.get(interaction.member.user.id).roles.add(otaRole);

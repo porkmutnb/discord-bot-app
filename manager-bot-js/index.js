@@ -27,15 +27,17 @@ client.on('messageCreate', (context) => {
     if(context.author.bot) {
         return;
     }
-    if(context.content.startsWith('*')) {
-        console.log('context', context);
-        if(context.content.toLowerCase() === '*cherprang') {
-            context.reply('สวัสดีค่ะ, ยินดีต้อนรับนะคะ').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
+    if(context.channelId === CH_INTRODUCTION_ID) {
+        if(context.content.startsWith('*')) {
+            console.log('context', context);
+            if(context.content.toLowerCase() === '*cherprang') {
+                context.reply('สวัสดีค่ะ, ยินดีต้อนรับนะคะ').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
+            }
+            if(context.content.toLowerCase() === '*setup') {
+                this.myFunction(context)
+            }
+            context.delete();
         }
-        if(context.content.toLowerCase() === '*setup') {
-            this.myFunction(context)
-        }
-        context.delete();
     }
 })
 
@@ -53,9 +55,11 @@ exports.myFunction = (context) => {
     let user = 0, verify = 0, bot = 0;
     const Guilds = client.guilds.cache.map((guild) => guild);
     Guilds[0].members.fetch().then(member => {
-        user = member.size;
         member.map(me => {
-            if(me._roles.length>0) {
+            if(!me.user.bot && me._roles.length==0) {
+                user++;
+            }
+            if(!me.user.bot && me._roles.length>0) {
                 verify++;
             }
             if(me.user.bot) {
