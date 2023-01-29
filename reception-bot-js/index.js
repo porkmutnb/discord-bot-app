@@ -14,8 +14,10 @@ const CH_GOODBYE_ID = process.env.CH_GOODBYE_ID;
 
 const CH_INTRODUCTION_ID = process.env.CH_INTRODUCTION_ID
 
+const prefix = `>`
+
 client.on('ready', () => {
-    client.user.setActivity('> Fond is working', { type: ActivityType.Listening });
+    client.user.setActivity(`${prefix} Fond is working`, { type: ActivityType.Listening });
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
@@ -24,10 +26,9 @@ client.on('messageCreate', (context) => {
         return;
     }
     if(context.channelId === CH_INTRODUCTION_ID) {
-        console.log('context', context);
-        if(context.content.startsWith('>')) {
+        if(context.content.startsWith(`${prefix}`)) {
             console.log('context', context);
-            if(context.content.toLowerCase() === '>fond') {
+            if(context.content.toLowerCase() === `${prefix}fond`) {
                 context.reply('เรียกหนูทำไมคะ, คิดถึงหนูหรอ').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
             }
             setTimeout(() => context.delete(), 3000)

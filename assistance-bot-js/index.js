@@ -18,6 +18,8 @@ const CH_REQUEST_FRIEND_ID = process.env.CH_REQUEST_FRIEND_ID
 const OWNER_ID = process.env.OWNER_ID
 const ADMIN_ID = process.env.ADMIN_ID
 
+const prefix = '!';
+
 const client = new Client({ 
     intents: [
         GatewayIntentBits.Guilds,
@@ -29,7 +31,7 @@ const client = new Client({
 });
 
 client.on('ready', () => {
-    client.user.setActivity('! Pupe is watching', { type: ActivityType.Watching });
+    client.user.setActivity(`${prefix} Pupe is watching`, { type: ActivityType.Watching });
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
@@ -38,11 +40,11 @@ client.on('messageCreate', (context) => {
         
     }else {
         if(context.channelId === CH_INTRODUCTION_ID) {
-            console.log('context', context);
-            if(context.content.startsWith('!')) {
-                if(context.content.toLowerCase() === '!ping') {
+            if(context.content.startsWith(`${prefix}`)) {
+                console.log('context', context);
+                if(context.content.toLowerCase() === `${prefix}ping`) {
                     context.reply('pong').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
-                }else if(context.content.toLowerCase() === '!invite') {
+                }else if(context.content.toLowerCase() === `${prefix}invite`) {
                     let isUserMemberRole = context.member.roles.cache.has(MEMBER_ID);
                     let isOwnerRole = context.member.roles.cache.has(OWNER_ID);
                     let isAdminRole = context.member.roles.cache.has(ADMIN_ID);
@@ -60,7 +62,7 @@ client.on('messageCreate', (context) => {
                     }else {
                         context.reply(`นายท่านไม่มีสิทธิใช้คำสั่งนี้นะคะ`).then(msg => { setTimeout(() => msg.delete(), 5000 ) });
                     }
-                }else if(context.content.toLowerCase() === '!role') {
+                }else if(context.content.toLowerCase() === `${prefix}role`) {
                     let isUserMemberRole = context.member.roles.cache.has(MEMBER_ID);
                     const Member = new ActionRowBuilder()
                                     .addComponents(
@@ -102,9 +104,9 @@ client.on('messageCreate', (context) => {
                                             .setStyle(ButtonStyle.Danger),
                     );
                     context.reply({ content: 'ต้องการ Role หรือคะ นายท่าน,', components: [Member,Gamer,Ota, Friend] }).then(msg => { setTimeout(() => msg.delete(), 10000 ) });
-                }else if(context.content.toLowerCase() === '!pupe') {
+                }else if(context.content.toLowerCase() === `${prefix}pupe`) {
                     context.reply('เรียกอิชั้นทำไมคะนายท่าน, คิดถึงชั้นหรอ').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
-                }else if(context.content.toLowerCase() === '!setup' && context.author.id == OWNER_ID) {
+                }else if(context.content.toLowerCase() === `${prefix}setup` && context.author.id == OWNER_ID) {
                     const embed = new EmbedBuilder()
                             .setColor(0xC995C1)
                             .setTitle('คำสั่งของดิชั้นนะคะ')
@@ -118,7 +120,13 @@ client.on('messageCreate', (context) => {
                             .setFooter({ text: `Powered by @cherMew` });
                     context.guild.channels.cache.find(i => i.id === CH_INTRODUCTION_ID).send({ embeds: [embed] });
                 }
-                setTimeout(() => context.delete(), 5000 );
+                setTimeout(() => context.delete(), 3000 );
+            }else if(context.content.startsWith('*')) {
+            }else if(context.content.startsWith('>')) {
+            }else if(context.content.startsWith('#')) {
+            }else {
+                context.reply('เพื่อรักษาความเรียบร้อย, อิชั้นขอลบโพสต์ที่ไม่เกี่ยวข้องนะคะ').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
+                setTimeout(() => context.delete(), 3000 );
             }
         }
     }
@@ -127,26 +135,35 @@ client.on('messageCreate', (context) => {
 client.on(Events.InteractionCreate, async interaction => {
     console.log('interaction', interaction);
     if(interaction.customId === 'member') {
-        let memberRole = interaction.member.guild.roles.cache.find(role => role.id === MEMBER_ID);
-        let isUserMemberRole = interaction.member.roles.cache.has(memberRole.id);
-        if (memberRole && !isUserMemberRole) {
-            interaction.guild.members.cache.get(interaction.member.user.id).roles.add(memberRole);
-            interaction.reply(`${interaction.member.user}เพิ่ม Role MEMBER ให้นายท่านเรียบร้อยแล้วค่ะ`);
-        }else {
-            return;
-        }
+        const modal = new ModalBuilder()
+                        .setCustomId('memberRequest')
+                        .setTitle('แบบสอบถาม');
+        const nameInput = new TextInputBuilder()
+                        .setCustomId('nameInput')
+                        .setLabel("อยากให้เรียกคุณว่า?")
+                        .setStyle(TextInputStyle.Short)
+                        .setRequired(true);
+        const firstActionRow = new ActionRowBuilder().addComponents(nameInput);
+        modal.addComponents(firstActionRow);
+        await interaction.showModal(modal);
     }else if(interaction.customId === 'gamer') {
         const modal = new ModalBuilder()
                         .setCustomId('gameRequest')
                         .setTitle('แบบสอบถาม');
+        const nameInput = new TextInputBuilder()
+                        .setCustomId('nameInput')
+                        .setLabel("อยากให้เรียกคุณว่า?")
+                        .setStyle(TextInputStyle.Short)
+                        .setRequired(true);
         const gameInput = new TextInputBuilder()
                         .setCustomId('gameInput')
                         .setLabel("คุณเล่นเกมอะไร?")
                         .setPlaceholder("Ex. [GTA, RDR, MINECRAFT, Other]")
                         .setStyle(TextInputStyle.Paragraph)
                         .setRequired(true);
-        const firstActionRow = new ActionRowBuilder().addComponents(gameInput);
-        modal.addComponents(firstActionRow);
+        const firstActionRow = new ActionRowBuilder().addComponents(nameInput);
+        const secondActionRow = new ActionRowBuilder().addComponents(gameInput);
+        modal.addComponents(firstActionRow, secondActionRow);
         await interaction.showModal(modal);
     }else if(interaction.customId === 'friend') {
         const acceptFriend = new ActionRowBuilder()
@@ -165,7 +182,7 @@ client.on(Events.InteractionCreate, async interaction => {
 			.setTitle('แบบสอบถาม');
         const nameInput = new TextInputBuilder()
 			.setCustomId('nameInput')
-			.setLabel("ชื่อคุณ?")
+			.setLabel("อยากให้เรียกคุณว่า?")
 			.setStyle(TextInputStyle.Short)
             .setRequired(true);
         const oshiInput = new TextInputBuilder()
@@ -191,7 +208,16 @@ client.on(Events.InteractionCreate, async interaction => {
         }
         console.log('userId =>', userId);
     }else if (interaction.isModalSubmit()) {
-        if(interaction.customId === 'otaRequest') {
+        if(interaction.customId === 'memberRequest') {
+            let nameInput = interaction.fields.getTextInputValue('nameInput');
+            let memberRole = interaction.member.guild.roles.cache.find(role => role.id === MEMBER_ID);
+            let isUserMemberRole = interaction.member.roles.cache.has(memberRole.id);
+            if (memberRole && !isUserMemberRole) {
+                interaction.guild.members.cache.get(interaction.member.user.id).setNickname(nameInput);
+                interaction.guild.members.cache.get(interaction.member.user.id).roles.add(memberRole);
+                interaction.reply(`${interaction.member.user}เพิ่ม Role MEMBER ให้นายท่านเรียบร้อยแล้วค่ะ`);
+            }
+        }else if(interaction.customId === 'otaRequest') {
             let nameInput = interaction.fields.getTextInputValue('nameInput');
             let oshiInput = interaction.fields.getTextInputValue('oshiInput');
             oshiInput = oshiInput.length>10 ? oshiInput.substring(0,9)+`...` : oshiInput;
@@ -200,11 +226,10 @@ client.on(Events.InteractionCreate, async interaction => {
             if (otaRole && !isUserOtaRole) {
                 interaction.guild.members.cache.get(interaction.member.user.id).roles.add(otaRole);
                 interaction.guild.members.cache.get(interaction.member.user.id).setNickname(nameInput+'|'+oshiInput);
-                interaction.reply(`${interaction.member.user} เพิ่ม Role OTA ให้นายท่านเรียบร้อยแล้วค่ะ`).then(msg => { setTimeout(() => msg.delete(), 5000 ) });
-            }else {
-                interaction.reply(`${interaction.member.user} นายท่านคะ, พอดีระบบมีปัญหา รบกวนนายท่านกดอีกรอบนะเจ้าคะ`).then(msg => { setTimeout(() => msg.delete(), 2000 ) });
+                interaction.reply(`${interaction.member.user} เพิ่ม Role OTA ให้นายท่านเรียบร้อยแล้วค่ะ`);
             }
         }else if(interaction.customId === 'gameRequest') {
+            let nameInput = interaction.fields.getTextInputValue('nameInput');
             let gameOption = interaction.fields.getTextInputValue('gameInput');
             let gameRole = "";
             switch (gameOption.toUpperCase()) {
@@ -223,10 +248,9 @@ client.on(Events.InteractionCreate, async interaction => {
             }
             let isUserGamerRole = interaction.member.roles.cache.has(gameRole.id);
             if (gamerRole && !isUserGamerRole) {
+                interaction.guild.members.cache.get(interaction.member.user.id).setNickname(nameInput);
                 interaction.guild.members.cache.get(interaction.member.user.id).roles.add(gamerRole);
                 interaction.reply(`${interaction.member.user} เพิ่ม Role ${gameOption} ให้นายท่านเรียบร้อยแล้วค่ะ`);
-            }else {
-                return;
             }
         }
     }

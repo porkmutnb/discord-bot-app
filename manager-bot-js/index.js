@@ -18,8 +18,10 @@ const BOT_COUNT = process.env.BOT_COUNT;
 
 const CH_INTRODUCTION_ID = process.env.CH_INTRODUCTION_ID;
 
-client.on('ready', (context) => {
-    client.user.setActivity('* Cherprang is working', { type: ActivityType.Listening });
+const prefix = '*';
+
+client.on('ready', () => {
+    client.user.setActivity(`${prefix} Cherprang is working`, { type: ActivityType.Listening });
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
@@ -28,12 +30,14 @@ client.on('messageCreate', (context) => {
         return;
     }
     if(context.channelId === CH_INTRODUCTION_ID) {
-        if(context.content.startsWith('*')) {
+        let isOwnerRole = context.member.roles.cache.has(OWNER_ID);
+        let isAdminRole = context.member.roles.cache.has(ADMIN_ID);
+        if(context.content.startsWith(`${prefix}`)) {
             console.log('context', context);
-            if(context.content.toLowerCase() === '*cherprang') {
+            if(context.content.toLowerCase() === `${prefix}cherprang`) {
                 context.reply('สวัสดีค่ะ, ยินดีต้อนรับนะคะ').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
             }
-            if(context.content.toLowerCase() === '*setup') {
+            if(context.content.toLowerCase() === `${prefix}setup` && (isOwnerRole||isAdminRole)) {
                 this.myFunction(context)
             }
             context.delete();

@@ -9,5 +9,8 @@ create Dockerfile on project and code command bottom to this file
     # Start the bot.
     CMD ["node", "index.js"]
 run command the next step by step
+
 docker build -t [discord-bot] .
 docker run --name [discord-bot] -d -p [portIn:portOut] [discord-bot]
+
+docker image ls
