@@ -42,12 +42,12 @@ client.on('messageCreate', (context) => {
         if(context.channelId === CH_INTRODUCTION_ID) {
             if(context.content.startsWith(`${prefix}`)) {
                 console.log('context', context);
+                let isOwnerRole = context.member.roles.cache.has(OWNER_ID);
+                let isAdminRole = context.member.roles.cache.has(ADMIN_ID);
+                let isUserMemberRole = context.member.roles.cache.has(MEMBER_ID);
                 if(context.content.toLowerCase() === `${prefix}ping`) {
                     context.reply('pong').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
                 }else if(context.content.toLowerCase() === `${prefix}invite`) {
-                    let isUserMemberRole = context.member.roles.cache.has(MEMBER_ID);
-                    let isOwnerRole = context.member.roles.cache.has(OWNER_ID);
-                    let isAdminRole = context.member.roles.cache.has(ADMIN_ID);
                     if(isUserMemberRole||isOwnerRole||isAdminRole) {
                         context.channel.createInvite(
                             {
@@ -63,7 +63,6 @@ client.on('messageCreate', (context) => {
                         context.reply(`นายท่านไม่มีสิทธิใช้คำสั่งนี้นะคะ`).then(msg => { setTimeout(() => msg.delete(), 5000 ) });
                     }
                 }else if(context.content.toLowerCase() === `${prefix}role`) {
-                    let isUserMemberRole = context.member.roles.cache.has(MEMBER_ID);
                     const Member = new ActionRowBuilder()
                                     .addComponents(
                                         new ButtonBuilder()
@@ -106,7 +105,7 @@ client.on('messageCreate', (context) => {
                     context.reply({ content: 'ต้องการ Role หรือคะ นายท่าน,', components: [Member,Gamer,Ota, Friend] }).then(msg => { setTimeout(() => msg.delete(), 10000 ) });
                 }else if(context.content.toLowerCase() === `${prefix}pupe`) {
                     context.reply('เรียกอิชั้นทำไมคะนายท่าน, คิดถึงชั้นหรอ').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
-                }else if(context.content.toLowerCase() === `${prefix}setup` && context.author.id == OWNER_ID) {
+                }else if(context.content.toLowerCase() === `${prefix}setup` && (isOwnerRole || isAdminRole)) {
                     const embed = new EmbedBuilder()
                             .setColor(0xC995C1)
                             .setTitle('คำสั่งของดิชั้นนะคะ')
