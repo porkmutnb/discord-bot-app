@@ -24,6 +24,8 @@ module.exports = {
                         { name: '/play', value: 'Mobile จะร้องเพลงให้ฟัง', inline: true },
                         { name: '/setup', value: 'Command for Singer', inline: true },
                         { name: '/add', value: 'Add Song to Music Queue', inline: true },
+                        { name: '/loop', value: 'You need to Repeat Music Queue', inline: true },
+                        { name: '/volume', value: 'You need Loundness', inline: true },
                         { name: '/skip', value: 'Next Song from Music Queue', inline: true },
                         { name: '/leave', value: 'let Mobile go~~', inline: true },
                     )

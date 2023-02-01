@@ -40,7 +40,7 @@ client.distube = new DisTube(client, {
 
 client.commands = new Collection();
 
-const songPrompt = ['play', 'add', 'skip', 'leave'];
+const songPrompt = ['play', 'add', 'loop', 'skip', 'volume', 'leave'];
 const commands = [];
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
