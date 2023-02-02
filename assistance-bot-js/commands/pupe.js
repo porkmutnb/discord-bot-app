@@ -8,11 +8,12 @@ module.exports = {
 		.setName('pupe')
 		.setDescription('Replies with Hi!'),
 	async execute(interaction) {
+        await interaction.deferReply().catch(err => {});
         if(interaction.channelId==CH_INTRODUCTION_ID) {
-            await interaction.reply(`เรียกอิชั้นทำไมคะนายท่าน, คิดถึงชั้นหรอ`);
+            await interaction.followUp(`เรียกอิชั้นทำไมคะนายท่าน, คิดถึงชั้นหรอ`);
             setTimeout(() => interaction.deleteReply(), 3000);
         }else {
-            await interaction.reply(`Pupe รับคำสั่งได้แค่ห้อง introduction เท่านั้นนะคะ! ${interaction.user}.`);
+            await interaction.followUp(`Pupe รับคำสั่งได้แค่ห้อง introduction เท่านั้นนะคะ! ${interaction.user}.`);
             setTimeout(() => interaction.deleteReply(), 3000);
         }
 	},

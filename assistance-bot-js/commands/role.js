@@ -16,8 +16,8 @@ module.exports = {
 		.setName('role')
 		.setDescription('Want your Role'),
 	async execute(interaction) {
+        await interaction.deferReply().catch(err => {});
         if(interaction.channelId==CH_INTRODUCTION_ID) {
-            await interaction.deferReply().catch(err => {})
             let isUserMemberRole = interaction.member.roles.cache.has(MEMBER_ID);
             const Member = new ActionRowBuilder()
                             .addComponents(
@@ -60,7 +60,7 @@ module.exports = {
             );
             interaction.followUp({ content: 'ต้องการ Role หรือคะ นายท่าน,', components: [Member,Gamer,Ota, Friend] }).then(msg => { setTimeout(() => msg.delete(), 10000 ) });
         }else {
-            await interaction.reply(`Pupe รับคำสั่งได้แค่ห้อง introduction เท่านั้นนะคะ! ${interaction.user}.`);
+            await interaction.followUp(`Pupe รับคำสั่งได้แค่ห้อง introduction เท่านั้นนะคะ! ${interaction.user}.`);
             setTimeout(() => interaction.deleteReply(), 3000);
         }
 	},

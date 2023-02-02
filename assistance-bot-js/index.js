@@ -1,11 +1,12 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, GatewayIntentBits, REST, Routes } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, REST, Routes, Events } = require('discord.js');
 const { config } = require('dotenv').config();
+const { addRoleFunction } = require('./function/addRole');
+const { formRequestFunction } = require('./function/formRoleRequest');
 
-CLIENT_ID = process.env.CLIENT_ID;
-SERVER_ID = process.env.SERVER_ID;
-const CH_INTRODUCTION_ID = process.env.CH_INTRODUCTION_ID
+const CLIENT_ID = process.env.CLIENT_ID;
+const SERVER_ID = process.env.SERVER_ID;
 
 const client = new Client({ 
     intents: [
@@ -13,7 +14,7 @@ const client = new Client({
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildInvites,
-        GatewayIntentBits.MessageContent
+        GatewayIntentBits.MessageContent,
     ] 
 });
 
@@ -21,6 +22,7 @@ client.commandsPath = new Collection();
 
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
+const songPrompt = ['invite', 'pupe', 'role', 'setup'];
 const commandsPath = [];
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
@@ -54,5 +56,34 @@ for (const file of eventFiles) {
 		client.on(event.name, (...args) => event.execute(...args));
 	}
 }
+
+client.on(Events.InteractionCreate, async interaction => {
+	if (interaction.isChatInputCommand()) {
+		// console.log('interaction', interaction);
+		// console.log('client', client);
+		const command = client.commandsPath.get(interaction.commandName);
+		if (!command) {
+			console.error(`No command matching ${interaction.commandName} was found.`);
+			return;
+		}
+		try {
+			if(songPrompt.includes(interaction.commandName)) {
+				await command.execute(interaction, client);
+			}else {
+				await command.execute(interaction);
+			}
+		} catch (error) {
+			console.error(error);
+			interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+		}
+	}else if (interaction.isModalSubmit()) {
+		await addRoleFunction(interaction, client);
+	}else {
+		let buttonActionList = ['memberRequest','gamerRequest','otaRequest','friendRequest'];
+		if(buttonActionList.includes(interaction.customId)) {
+			await formRequestFunction(interaction, client);
+		}
+	}
+});
 
 client.login(process.env.TOKEN);
