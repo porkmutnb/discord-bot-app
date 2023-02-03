@@ -1,7 +1,6 @@
 const { Client, GatewayIntentBits, ActionRowBuilder, ActivityType, ButtonBuilder, ButtonStyle, 
         Events, ModalBuilder, TextInputBuilder, TextInputStyle, EmbedBuilder, StringSelectMenuBuilder
 } = require('discord.js');
-const { Modal, TextInputComponent, SelectMenuComponent } = require('discord-modals');
 const { config } = require('dotenv').config();
 
 const MEMBER_ID = process.env.MEMBER_ID

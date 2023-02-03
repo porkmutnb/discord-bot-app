@@ -18,6 +18,9 @@ const BOT_COUNT = process.env.BOT_COUNT;
 
 const CH_INTRODUCTION_ID = process.env.CH_INTRODUCTION_ID;
 
+const OWNER_ID = process.env.OWNER_ID;
+const ADMIN_ID = process.env.ADMIN_ID;
+
 const prefix = '*';
 
 client.on('ready', () => {
