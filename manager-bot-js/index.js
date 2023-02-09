@@ -1,78 +1,74 @@
-const { Client, GatewayIntentBits, ActivityType } = require('discord.js');
+const fs = require('node:fs');
+const path = require('node:path');
+const { Discord, Client, Collection, GatewayIntentBits, REST, Routes, Events } = require('discord.js');
 const { config } = require('dotenv').config();
+
+const CLIENT_ID = process.env.CLIENT_ID;
+const SERVER_ID = process.env.SERVER_ID;
+
 const client = new Client({ 
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.MessageContent,
-    ],
-    disableEveryone: true
+    ] 
 });
 
-const SERVER_ID = process.env.SERVER_ID;
-const BOT_ID = process.env.BOT_ID;
-const TOTAL_COUNT = process.env.TOTAL_COUNT;
-const ONLINE_COUNT = process.env.ONLINE_COUNT;
-const BOT_COUNT = process.env.BOT_COUNT;
+client.commandsPath = new Collection();
 
-const CH_INTRODUCTION_ID = process.env.CH_INTRODUCTION_ID;
+const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
-const prefix = '*';
+const commandPrompt = ['cherprang', 'setup'];
+const commandsPath = [];
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+	commandsPath.push(command.data.toJSON());
+    client.commandsPath.set(command.data.name, command);
+}
+(async () => {
+	try {
+		console.log(`Started refreshing ${commandsPath.length} application (/) commands.`);
+		// The put method is used to fully refresh all commands in the guild with the current set
+		const data = await rest.put(
+			Routes.applicationGuildCommands(CLIENT_ID, SERVER_ID),
+			{ body: commandsPath },
+		);
+		console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+	} catch (error) {
+		// And of course, make sure you catch and log any errors!
+		console.error(error);
+	}
+})();
 
-client.on('ready', () => {
-    client.user.setActivity(`${prefix} Cherprang is working`, { type: ActivityType.Listening });
-    console.log(`Logged in as ${client.user.tag}!`);
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+for (const file of eventFiles) {
+	const filePath = path.join(eventsPath, file);
+	const event = require(filePath);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	} else {
+		client.on(event.name, (...args) => event.execute(...args));
+	}
+}
+
+client.on(Events.InteractionCreate, async interaction => {
+	if (interaction.isChatInputCommand()) {
+		const command = client.commandsPath.get(interaction.commandName);
+		if (!command) {
+			console.error(`No command matching ${interaction.commandName} was found.`);
+			return;
+		}
+		try {
+			await command.execute(interaction, client);
+		} catch (error) {
+			console.error(error);
+			interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+			setTimeout(() => interaction.deleteReply(), 5000);
+		}
+	}
 });
-
-client.on('messageCreate', (context) => {
-    if(context.author.bot) {
-        return;
-    }
-    if(context.channelId === CH_INTRODUCTION_ID) {
-        let isOwnerRole = context.member.roles.cache.has(OWNER_ID);
-        let isAdminRole = context.member.roles.cache.has(ADMIN_ID);
-        if(context.content.startsWith(`${prefix}`)) {
-            console.log('context', context);
-            if(context.content.toLowerCase() === `${prefix}cherprang`) {
-                context.reply('สวัสดีค่ะ, ยินดีต้อนรับนะคะ').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
-            }
-            if(context.content.toLowerCase() === `${prefix}setup` && (isOwnerRole||isAdminRole)) {
-                this.myFunction(context)
-            }
-            context.delete();
-        }
-    }
-})
-
-client.on('guildMemberAdd', (context) => {
-    this.myFunction(context)
-})
-
-client.on('guildMemberRemove', (context) => {
-    this.myFunction(context)
-})
 
 client.login(process.env.TOKEN);
-
-exports.myFunction = (context) => {
-    let user = 0, verify = 0, bot = 0;
-    const Guilds = client.guilds.cache.map((guild) => guild);
-    Guilds[0].members.fetch().then(member => {
-        member.map(me => {
-            if(!me.user.bot && me._roles.length==0) {
-                user++;
-            }
-            if(!me.user.bot && me._roles.length>0) {
-                verify++;
-            }
-            if(me.user.bot) {
-                bot++;
-            }
-        })
-        console.log(`user:${user}, verify:${verify}, bot:${bot}`);
-        context.guild.channels.cache.find(ch => ch.id === TOTAL_COUNT).setName(`Total Users: ${user}`)
-        context.guild.channels.cache.find(ch => ch.id === ONLINE_COUNT).setName(`Total Members: ${verify}`)
-        context.guild.channels.cache.find(ch => ch.id === BOT_COUNT).setName(`Bot: ${bot}`)
-    })
-}
