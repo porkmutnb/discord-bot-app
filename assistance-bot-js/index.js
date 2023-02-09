@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, GatewayIntentBits, REST, Routes, Events } = require('discord.js');
+const { Discord, Client, Collection, GatewayIntentBits, REST, Routes, Events } = require('discord.js');
 const { config } = require('dotenv').config();
 const { addRoleFunction } = require('./function/addRole');
 const { formRequestFunction } = require('./function/formRoleRequest');
@@ -22,7 +22,7 @@ client.commandsPath = new Collection();
 
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
-const songPrompt = ['invite', 'pupe', 'role', 'setup'];
+const commandPrompt = ['invite', 'pupe', 'role', 'setup'];
 const commandsPath = [];
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
@@ -67,7 +67,7 @@ client.on(Events.InteractionCreate, async interaction => {
 			return;
 		}
 		try {
-			if(songPrompt.includes(interaction.commandName)) {
+			if(commandPrompt.includes(interaction.commandName)) {
 				await command.execute(interaction, client);
 			}else {
 				await command.execute(interaction);
@@ -75,6 +75,7 @@ client.on(Events.InteractionCreate, async interaction => {
 		} catch (error) {
 			console.error(error);
 			interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+			setTimeout(() => interaction.deleteReply(), 5000);
 		}
 	}else if (interaction.isModalSubmit()) {
 		await addRoleFunction(interaction, client);
@@ -82,6 +83,8 @@ client.on(Events.InteractionCreate, async interaction => {
 		let buttonActionList = ['memberRequest','gamerRequest','otaRequest','friendRequest'];
 		if(buttonActionList.includes(interaction.customId)) {
 			await formRequestFunction(interaction, client);
+		}else if(interaction.customId.indexOf('friendApprove')>-1) {
+			await addRoleFunction(interaction, client);
 		}
 	}
 });

@@ -2,6 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { config } = require('dotenv').config();
 
 const CH_INTRODUCTION_ID = process.env.CH_INTRODUCTION_ID;
+const MEMBER_ID = process.env.MEMBER_ID
 const OWNER_ID = process.env.OWNER_ID;
 const ADMIN_ID = process.env.ADMIN_ID;
 
@@ -14,6 +15,9 @@ module.exports = {
         if(interaction.channelId==CH_INTRODUCTION_ID) {
             let isOwner = interaction.member.roles.cache.has(OWNER_ID);
             let isAdmin = interaction.member.roles.cache.has(ADMIN_ID);
+            let memberRole = interaction.member.guild.roles.cache.find(role => role.id === MEMBER_ID);
+            let ownerRole = interaction.member.guild.roles.cache.find(role => role.id === OWNER_ID);
+            let adminRole = interaction.member.guild.roles.cache.find(role => role.id === ADMIN_ID);
             if(isOwner||isAdmin) {
                 const embed = new EmbedBuilder()
                             .setColor(0xC995C1)
@@ -23,8 +27,8 @@ module.exports = {
                             .addFields(
                                 { name: '/pupe', value: 'คุยกับดิชั้น', inline: true },
                                 { name: '/role', value: 'ต้องการ Role', inline: true },
-                                { name: '/invite', value: 'ต้องการ Invite your friend [only 𝓜𝓔𝓜𝓑𝓔𝓡]', inline: false },
-                                { name: '/setup', value: 'Command for Assistance [only 𝓞𝓦𝓝𝓔𝓡, 𝓐𝓓𝓜𝓘𝓝]', inline: false }
+                                { name: '/invite', value: `ต้องการ Invite your friend [only ${memberRole}]`, inline: false },
+                                { name: '/setup', value: `Command for Assistance [only ${ownerRole}, ${adminRole}]`, inline: false }
                             )
                             .setImage(`https://media.tenor.com/vERiw7A5pLUAAAAd/pupe-bnk48.gif`)
                             .setTimestamp()

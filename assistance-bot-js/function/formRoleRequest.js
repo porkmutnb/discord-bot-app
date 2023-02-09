@@ -1,4 +1,4 @@
-const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { Discord, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { config } = require('dotenv').config();
 
 const MEMBER_ID = process.env.MEMBER_ID
@@ -30,7 +30,7 @@ module.exports.formRequestFunction = async (interaction, client) => {
         await interaction.showModal(modal);
     }else if(interaction.customId==='gamerRequest') {
         const modal = new ModalBuilder()
-                    .setCustomId('gameForm')
+                    .setCustomId('gamerForm')
                     .setTitle('แบบสอบถาม');
         const nameInput = new TextInputBuilder()
                         .setCustomId('nameInput')
@@ -68,24 +68,15 @@ module.exports.formRequestFunction = async (interaction, client) => {
     }else if(interaction.customId==='friendRequest') {
         const friendRole = interaction.member.guild.roles.cache.find(role => role.id === FRIEND_ID);
         const roleConfirmMsg = `มีสมาชิกท่านนี้ ${interaction.member.user} ต้องการ Role ${friendRole}, แจ้งว่ารู้จักคุณ โปรดพิจารณา.`;
-
-        await interaction.guild.channels.cache.find(i => i.id === CH_REQUEST_FRIEND_ID).send(roleConfirmMsg).then(message => {
-            message.react('✅');
-            message.react('❎');
-            message.awaitReactions(async (reaction, user) => {
-                if (reaction.emoji.name === '✅' && user.id === interaction.message.author.id) {
-                    interaction.guild.members.cache.get(user.id).roles.add(friendRole);
-                    await interaction.deferReply().catch(err => {});
-                    interaction.followUp(`${interaction.member.user} เพิ่ม Role ${friendRole} ให้นายท่านเรียบร้อยแล้วค่ะ`)
-                    setTimeout(() => interaction.deleteReply(), 3000);
-                }else if(reaction.emoji.name === '❎' && user.id === interaction.message.author.id) {
-                    await interaction.deferReply().catch(err => {});
-                    interaction.followUp(`${interaction.member.user} Owner ไม่อนุมัติการเพิ่ม Role ${friendRole} ให้นายท่านนะคะ`)
-                    setTimeout(() => interaction.deleteReply(), 3000);
-                }
-            });
-        });
-        
+        const acceptFriend = new ActionRowBuilder()
+                        .addComponents(
+                            new ButtonBuilder()
+                                .setCustomId(`friendApprove|${interaction.member.user.id}`)
+                                .setLabel('Accept Friend')
+                                .setDisabled(false)
+                                .setStyle(ButtonStyle.Primary),
+        );
+        const confirmMessage = await interaction.guild.channels.cache.find(i => i.id === CH_REQUEST_FRIEND_ID).send({ content: roleConfirmMsg, components: [acceptFriend] });
         await interaction.deferReply().catch(err => {});
         interaction.followUp(`${interaction.member.user} รอ Owner อนุมัติการเพิ่ม Role ${friendRole} ให้นายท่านสักครู่นะคะ`)
         setTimeout(() => interaction.deleteReply(), 3000);
