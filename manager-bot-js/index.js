@@ -38,12 +38,12 @@ client.on('messageCreate', (context) => {
         if(context.content.startsWith(`${prefix}`)) {
             console.log('context', context);
             if(context.content.toLowerCase() === `${prefix}cherprang`) {
-                context.reply('สวัสดีค่ะ, ยินดีต้อนรับนะคะ').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
+                context.reply('สวัสดีค่ะ, ยินดีต้อนรับนะคะ').then(msg => { setTimeout(() => msg.delete(), 3000 ) });
             }
             if(context.content.toLowerCase() === `${prefix}setup` && (isOwnerRole||isAdminRole)) {
                 this.myFunction(context)
             }
-            context.delete();
+            setTimeout(() => context.delete(), 5000 );
         }
     }
 })
