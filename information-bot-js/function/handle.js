@@ -8,7 +8,7 @@ const SERVER_ID = process.env.SERVER_ID;
 const API_KEY = process.env.API_KEY;
 const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID;
 const CH_INFORMATION_ID = process.env.CH_INFORMATION_ID;
-const URL_GET_LASTED_VIDEO_BNK48 = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${YOUTUBE_CHANNEL_ID}&part=snippet,id&order=date&maxResults=1`;
+const URL_GET_LASTED_VIDEO_BNK48 = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${YOUTUBE_CHANNEL_ID}&part=snippet,id&order=date&maxResults=10`;
 
 module.exports.updateLatestVideo = async (client) => {
     //console.log('client', client);
@@ -18,7 +18,22 @@ module.exports.updateLatestVideo = async (client) => {
     await axios.get(URL_GET_LASTED_VIDEO_BNK48).then( response => {
         const data = response.data;
         if(data.items.length>0) {
-            if(global.videoId_lasted_bnk48==`` || global.videoId_lasted_bnk48!=data.items[0].id.videoId) {
+            if(global.videoId_lasted_bnk48==``) { 
+                for(var i=data.items.length-1; i>=0; i--) {
+                    const item = data.items[i];
+                    console.log(`item:`, item);
+
+                    const videoId = data.items[i].id.videoId;
+                    const title = data.items[i].snippet.title;
+                    const description = data.items[i].snippet.description
+                    const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+                    const message = `${title} \n ${description} \n คลิปใหม่ๆสดๆ จาก BNK48 Official => ${videoUrl}`;
+                    client.channels.cache.find(i => i.id == CH_INFORMATION_ID).send({ content: `${message}` });
+
+                    global.videoId_lasted_bnk48 = videoId;
+                }
+            }else if(global.videoId_lasted_bnk48!=data.items[0].id.videoId) {
                 console.log(`data:`, data);
                 
                 const videoId = data.items[0].id.videoId;
