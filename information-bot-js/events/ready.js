@@ -1,0 +1,52 @@
+const { Discord, Client, GatewayIntentBits } = require('discord.js');
+const { getChannel } = require('simple-youtube-api');
+const { ActivityType } = require('discord.js');
+const { config } = require('dotenv').config();
+const { updateLatestVideo } = require('../function/handle');
+
+const client = new Client({ 
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildInvites,
+        GatewayIntentBits.MessageContent,
+    ] 
+});
+
+const CH_INFORMATION_ID = process.env.CH_INFORMATION_ID;
+
+module.exports = {
+	name: 'ready',
+	once: true,
+	async execute(client) {
+		client.user.setActivity(`Pampam is watching`, { type: ActivityType.Competing });
+	    console.log(`Logged in as ${client.user.tag}!`);
+
+        // Get the latest video
+        updateLatestVideo(client);
+
+        // Schedule an interval to check for new videos
+        /***** Every 1 Day *****/
+        // setInterval(async () => {
+        //     updateLatestVideo(client)
+        // }, 24 * 60 * 60 * 1000);
+        /***** Every 12 hours *****/
+        // setInterval(async () => {
+        //     updateLatestVideo(client)
+        // }, 12 * 60 * 60 * 1000);
+        /***** Every hour *****/
+        setInterval(async () => {
+            updateLatestVideo(client)
+        }, 60 * 60 * 1000);
+        /***** Every minute *****/
+        // setInterval(async () => {
+        //     updateLatestVideo(client)
+        // }, 60 * 1000); 
+        /***** Every 30 second *****/
+        // setInterval(async () => {
+        //     updateLatestVideo(client)
+        // }, 30 * 1000);
+
+	},
+};
