@@ -2,7 +2,7 @@ const { Discord, Client, GatewayIntentBits } = require('discord.js');
 const { getChannel } = require('simple-youtube-api');
 const { ActivityType } = require('discord.js');
 const { config } = require('dotenv').config();
-const { updateLatestVideo } = require('../function/handle');
+const { updateLatestVideoBNK, updateLatestVideoCGM } = require('../function/handle');
 
 const client = new Client({ 
     intents: [
@@ -24,7 +24,8 @@ module.exports = {
 	    console.log(`Logged in as ${client.user.tag}!`);
 
         // Get the latest video
-        updateLatestVideo(client);
+        updateLatestVideoBNK(client);
+        updateLatestVideoCGM(client);
 
         // Schedule an interval to check for new videos
         /***** Every 1 Day *****/
@@ -37,7 +38,8 @@ module.exports = {
         // }, 12 * 60 * 60 * 1000);
         /***** Every hour *****/
         setInterval(async () => {
-            updateLatestVideo(client)
+            updateLatestVideoBNK(client);
+            updateLatestVideoCGM(client);
         }, 60 * 60 * 1000);
         /***** Every minute *****/
         // setInterval(async () => {
