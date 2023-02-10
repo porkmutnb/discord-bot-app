@@ -111,7 +111,7 @@ module.exports.updateLatestVideoCGM = async (client) => {
                     const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
                     const message = `${title} \n ${description} \n คลิปใหม่ๆสดๆ จาก CGM48 Official => ${videoUrl}`;
-                    // client.channels.cache.find(i => i.id == CH_NEWSWIRECGM_ID).send({ content: `${message}` });
+                    client.channels.cache.find(i => i.id == CH_NEWSWIRECGM_ID).send({ content: `${message}` });
 
                     global.videoId_lasted_cgm48 = videoId;
                 }
@@ -124,7 +124,7 @@ module.exports.updateLatestVideoCGM = async (client) => {
                 const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
                 const message = `${title} \n ${description} \n คลิปใหม่ๆสดๆ จาก CGM48 Official => ${videoUrl}`;
-                // client.channels.cache.find(i => i.id == CH_NEWSWIRECGM_ID).send({ content: `${message}` });
+                client.channels.cache.find(i => i.id == CH_NEWSWIRECGM_ID).send({ content: `${message}` });
 
                 // const embed = new EmbedBuilder()
                 //         .setColor("#C995C1")
