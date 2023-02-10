@@ -7,7 +7,7 @@ global.videoId_lasted_cgm48 = ``;
 
 const SERVER_ID = process.env.SERVER_ID;
 const API_KEY = process.env.API_KEY;
-const BNK_YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID;
+const BNK_YOUTUBE_CHANNEL_ID = process.env.BNK_YOUTUBE_CHANNEL_ID;
 const CGM_YOUTUBE_CHANNEL_ID = process.env.CGM_YOUTUBE_CHANNEL_ID;
 const CH_NEWSWIREBNK_ID = process.env.CH_NEWSWIREBNK_ID;
 const CH_NEWSWIRECGM_ID = process.env.CH_NEWSWIRECGM_ID;
@@ -19,6 +19,17 @@ module.exports.updateLatestVideoBNK = async (client) => {
     //console.log('===>', client.guilds.cache.get(SERVER_ID));
     //console.log('client.user', client.user);
     const guild = client.guilds.cache.get(SERVER_ID);
+
+    const messageHistory = await client.channels.cache.find(i => i.id == CH_NEWSWIREBNK_ID).messages.fetch().then(messages => {
+        //console.log(`BNK Received ${messages.size} messages`);
+        //Iterate through the messages here with the variable "messages".
+        messages.forEach(message => {
+            global.videoId_lasted_bnk48 = global.videoId_lasted_bnk48=='' ? message.content.split('?v=')[1] : global.videoId_lasted_bnk48;
+        })
+        return messages.size;
+    });
+    console.log(`BNK messageHistory: ${messageHistory}`);
+
     await axios.get(URL_GET_LASTED_VIDEO_BNK48).then( response => {
         const data = response.data;
         if(data.items.length>0) {
@@ -75,6 +86,17 @@ module.exports.updateLatestVideoCGM = async (client) => {
     //console.log('===>', client.guilds.cache.get(SERVER_ID));
     //console.log('client.user', client.user);
     const guild = client.guilds.cache.get(SERVER_ID);
+
+    const messageHistory = await client.channels.cache.find(i => i.id == CH_NEWSWIRECGM_ID).messages.fetch().then(messages => {
+        //console.log(`CGM Received ${messages.size} messages`);
+        //Iterate through the messages here with the variable "messages".
+        messages.forEach(message => {
+            global.videoId_lasted_cgm48 = global.videoId_lasted_cgm48=='' ? message.content.split('?v=')[1] : global.videoId_lasted_cgm48;
+        })
+        return messages.size;
+    });
+    console.log(`CGM messageHistory: ${messageHistory}`);
+
     await axios.get(URL_GET_LASTED_VIDEO_CGM48).then( response => {
         const data = response.data;
         if(data.items.length>0) {
@@ -89,7 +111,7 @@ module.exports.updateLatestVideoCGM = async (client) => {
                     const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
                     const message = `${title} \n ${description} \n คลิปใหม่ๆสดๆ จาก CGM48 Official => ${videoUrl}`;
-                    client.channels.cache.find(i => i.id == CH_NEWSWIRECGM_ID).send({ content: `${message}` });
+                    // client.channels.cache.find(i => i.id == CH_NEWSWIRECGM_ID).send({ content: `${message}` });
 
                     global.videoId_lasted_cgm48 = videoId;
                 }
@@ -102,7 +124,7 @@ module.exports.updateLatestVideoCGM = async (client) => {
                 const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
                 const message = `${title} \n ${description} \n คลิปใหม่ๆสดๆ จาก CGM48 Official => ${videoUrl}`;
-                client.channels.cache.find(i => i.id == CH_NEWSWIRECGM_ID).send({ content: `${message}` });
+                // client.channels.cache.find(i => i.id == CH_NEWSWIRECGM_ID).send({ content: `${message}` });
 
                 // const embed = new EmbedBuilder()
                 //         .setColor("#C995C1")

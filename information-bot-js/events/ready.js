@@ -30,25 +30,34 @@ module.exports = {
         // Schedule an interval to check for new videos
         /***** Every 1 Day *****/
         // setInterval(async () => {
-        //     updateLatestVideo(client)
+        //     updateLatestVideoBNK(client);
+        //     updateLatestVideoCGM(client);
         // }, 24 * 60 * 60 * 1000);
         /***** Every 12 hours *****/
         // setInterval(async () => {
-        //     updateLatestVideo(client)
+        //     updateLatestVideoBNK(client);
+        //     updateLatestVideoCGM(client);
         // }, 12 * 60 * 60 * 1000);
         /***** Every hour *****/
-        setInterval(async () => {
-            updateLatestVideoBNK(client);
-            updateLatestVideoCGM(client);
-        }, 60 * 60 * 1000);
+        // setInterval(async () => {
+        //     updateLatestVideoBNK(client);
+        //     updateLatestVideoCGM(client);
+        // }, 60 * 60 * 1000);
         /***** Every minute *****/
         // setInterval(async () => {
-        //     updateLatestVideo(client)
+        //     updateLatestVideoBNK(client);
+        //     updateLatestVideoCGM(client);
         // }, 60 * 1000); 
         /***** Every 30 second *****/
         // setInterval(async () => {
-        //     updateLatestVideo(client)
+        //     updateLatestVideoBNK(client);
+        //     updateLatestVideoCGM(client);
         // }, 30 * 1000);
+        /***** Every 5 second *****/
+        setInterval(async () => {
+            updateLatestVideoBNK(client);
+            updateLatestVideoCGM(client);
+        }, 5 * 1000);
 
 	},
 };
