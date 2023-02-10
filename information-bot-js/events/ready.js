@@ -39,10 +39,10 @@ module.exports = {
         //     updateLatestVideoCGM(client);
         // }, 12 * 60 * 60 * 1000);
         /***** Every hour *****/
-        // setInterval(async () => {
-        //     updateLatestVideoBNK(client);
-        //     updateLatestVideoCGM(client);
-        // }, 60 * 60 * 1000);
+        setInterval(async () => {
+            updateLatestVideoBNK(client);
+            updateLatestVideoCGM(client);
+        }, 60 * 60 * 1000);
         /***** Every minute *****/
         // setInterval(async () => {
         //     updateLatestVideoBNK(client);
@@ -54,10 +54,10 @@ module.exports = {
         //     updateLatestVideoCGM(client);
         // }, 30 * 1000);
         /***** Every 5 second *****/
-        setInterval(async () => {
-            updateLatestVideoBNK(client);
-            updateLatestVideoCGM(client);
-        }, 5 * 1000);
+        // setInterval(async () => {
+        //     updateLatestVideoBNK(client);
+        //     updateLatestVideoCGM(client);
+        // }, 5 * 1000);
 
 	},
 };
