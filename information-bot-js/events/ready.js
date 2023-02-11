@@ -24,7 +24,7 @@ module.exports = {
 
         // Get the latest video
         updateLatestVideoBNK(client);
-        //updateLatestVideoCGM(client);
+        updateLatestVideoCGM(client);
         renderSummaryCovid19(client);
 
         // Schedule an interval to check for new videos
@@ -40,8 +40,8 @@ module.exports = {
         // }, 12 * 60 * 60 * 1000);
         /***** Every hour *****/
         setInterval(async () => {
-            //updateLatestVideoBNK(client);
-            //updateLatestVideoCGM(client);
+            updateLatestVideoBNK(client);
+            updateLatestVideoCGM(client);
             getCovidSummaryByCountry();
         }, 60 * 60 * 1000);
         /***** Every minute *****/
