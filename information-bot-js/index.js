@@ -20,7 +20,6 @@ client.commandsPath = new Collection();
 
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
-const commandPrompt = ['pampam'];
 const commandsPath = [];
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {

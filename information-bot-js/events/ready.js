@@ -3,6 +3,7 @@ const { getChannel } = require('simple-youtube-api');
 const { ActivityType } = require('discord.js');
 const { config } = require('dotenv').config();
 const { updateLatestVideoBNK, updateLatestVideoCGM } = require('../function/handle');
+const { renderSummaryCovid19 } = require('../function/reportCovid19');
 
 const client = new Client({ 
     intents: [
@@ -14,8 +15,6 @@ const client = new Client({
     ] 
 });
 
-const CH_INFORMATION_ID = process.env.CH_INFORMATION_ID;
-
 module.exports = {
 	name: 'ready',
 	once: true,
@@ -25,7 +24,8 @@ module.exports = {
 
         // Get the latest video
         updateLatestVideoBNK(client);
-        updateLatestVideoCGM(client);
+        //updateLatestVideoCGM(client);
+        renderSummaryCovid19(client);
 
         // Schedule an interval to check for new videos
         /***** Every 1 Day *****/
@@ -40,8 +40,9 @@ module.exports = {
         // }, 12 * 60 * 60 * 1000);
         /***** Every hour *****/
         setInterval(async () => {
-            updateLatestVideoBNK(client);
-            updateLatestVideoCGM(client);
+            //updateLatestVideoBNK(client);
+            //updateLatestVideoCGM(client);
+            getCovidSummaryByCountry();
         }, 60 * 60 * 1000);
         /***** Every minute *****/
         // setInterval(async () => {
