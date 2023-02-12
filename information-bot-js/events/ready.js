@@ -42,7 +42,7 @@ module.exports = {
         setInterval(async () => {
             updateLatestVideoBNK(client);
             updateLatestVideoCGM(client);
-            getCovidSummaryByCountry();
+            renderSummaryCovid19();
         }, 60 * 60 * 1000);
         /***** Every minute *****/
         // setInterval(async () => {
