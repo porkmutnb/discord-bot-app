@@ -87,7 +87,7 @@ module.exports.renderSummaryCovid19 = async (client) => {
     });
     let dateLasted = timestampLasted==`` ? null : new Date(timestampLasted);
     let dateNow = new Date();
-    if((timestampLasted!=`` && dateNow.getDate()!=dateLasted.getDate()) || dateLasted==null) {
+    if((timestampLasted!=`` && dateNow.getMonth()!=dateLasted.getMonth()) || dateLasted==null) {
         const data = await this.getCovidSummaryAll(false);
         if(data.length<=1) {
             const exampleEmbed = {
