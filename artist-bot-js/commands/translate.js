@@ -33,7 +33,8 @@ module.exports = {
                     console.log('res =>', res);
                     const embed = new EmbedBuilder()
                                     .setColor(0xC995C1)
-                                    .setTitle(`${text} คำนี้ในภาษา ${to} แปลว่า ${res.text}`)
+                                    .setTitle(`${text} คำนี้ในภาษา ${to}`)
+                                    .setDescription(`แปลว่า ${res.text}`)
                                     .setTimestamp()
                                     .setFooter({ text: 'Powerd be cherMew', iconURL: `https://cdn.discordapp.com/icons/${interaction.guild.id}/${interaction.guild.icon}.webp` });
 
