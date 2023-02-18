@@ -4,7 +4,9 @@ module.exports = {
 	name: 'ready',
 	once: true,
 	execute(client) {
-		client.user.setActivity(`Cherprang is working`, { type: ActivityType.Listening });
+		client.user.setActivity(`📋 Cherprang is listen to opinions`, {
+			type: ActivityType.Listening
+		})
 	    console.log(`Logged in as ${client.user.tag}!`);
 	},
 };

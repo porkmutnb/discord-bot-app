@@ -4,9 +4,9 @@ module.exports = {
 	name: 'ready',
 	once: true,
 	execute(client) {
-		client.user.setActivity(`👓 Pupe is watching you`, {
+		client.user.setActivity(`🔎 Fond Look for the new member`, {
 			type: ActivityType.Watching
 		})
-	    console.log(`Logged in as ${client.user.tag}!`);
+        console.log(`Logged in as ${client.user.tag}!`);
 	},
 };

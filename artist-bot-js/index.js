@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Discord, Client, Collection, GatewayIntentBits, REST, Routes, Events } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, REST, Routes, Events } = require('discord.js');
 const { config } = require('dotenv').config();
 
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -11,6 +11,7 @@ const client = new Client({
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildInvites,
         GatewayIntentBits.MessageContent,
     ] 
 });
@@ -19,7 +20,7 @@ client.commandsPath = new Collection();
 
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
-const commandPrompt = ['fond'];
+const commandPrompt = ['pancake', 'imagine', 'translate', 'setup'];
 const commandsPath = [];
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
@@ -44,7 +45,6 @@ for (const file of commandFiles) {
 
 const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
-console.log(`Started refreshing ${eventFiles.length} application (/) events.`);
 for (const file of eventFiles) {
 	const filePath = path.join(eventsPath, file);
 	const event = require(filePath);
@@ -56,19 +56,23 @@ for (const file of eventFiles) {
 }
 
 client.on(Events.InteractionCreate, async interaction => {
-	if (interaction.isChatInputCommand()) {
-		const command = client.commandsPath.get(interaction.commandName);
-		if (!command) {
-			console.error(`No command matching ${interaction.commandName} was found.`);
-			return;
-		}
-		try {
+	if (!interaction.isChatInputCommand()) return;
+	console.log(interaction);
+    console.log(client.commandsPath);
+    const command = client.commandsPath.get(interaction.commandName);
+	if (!command) {
+		console.error(`No command matching ${interaction.commandName} was found.`);
+		return;
+	}
+	try {
+		if(commandPrompt.includes(interaction.commandName)) {
 			await command.execute(interaction, client);
-		} catch (error) {
-			console.error(error);
-			interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-			setTimeout(() => interaction.deleteReply(), 5000);
+		}else {
+			await command.execute(interaction);
 		}
+	} catch (error) {
+		console.error(error);
+		interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
 });
 

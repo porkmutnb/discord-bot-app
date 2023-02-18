@@ -11,6 +11,7 @@ const client = new Client({
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildInvites,
         GatewayIntentBits.MessageContent,
     ] 
 });
@@ -19,7 +20,6 @@ client.commandsPath = new Collection();
 
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
-const commandPrompt = ['fond'];
 const commandsPath = [];
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
@@ -44,7 +44,6 @@ for (const file of commandFiles) {
 
 const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
-console.log(`Started refreshing ${eventFiles.length} application (/) events.`);
 for (const file of eventFiles) {
 	const filePath = path.join(eventsPath, file);
 	const event = require(filePath);
@@ -57,6 +56,8 @@ for (const file of eventFiles) {
 
 client.on(Events.InteractionCreate, async interaction => {
 	if (interaction.isChatInputCommand()) {
+		// console.log('interaction', interaction);
+		// console.log('client', client);
 		const command = client.commandsPath.get(interaction.commandName);
 		if (!command) {
 			console.error(`No command matching ${interaction.commandName} was found.`);

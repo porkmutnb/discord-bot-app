@@ -23,7 +23,7 @@ module.exports = {
                             .setColor(0xC995C1)
                             .setTitle('คำสั่งของดิชั้นนะคะ')
                             .setDescription('Command for Assistance')
-                            .setThumbnail(`https://scontent.fbkk8-2.fna.fbcdn.net/v/t39.30808-6/302054065_625054718989411_2467317685068967605_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=174925&_nc_eui2=AeHiZa-EYXRJGRn5txfNoA8j3mHiALYAztfeYeIAtgDO18JG0qXepRYB25_dT-BWhxbNbAO9NkXcs3vgqdOTx-jh&_nc_ohc=uv15l4Z6KlwAX8rPKnz&_nc_ht=scontent.fbkk8-2.fna&oh=00_AfAzfit51DLbOhx14yd6wY8OfgX5PB2c-WNLRU4D6crqwQ&oe=63E9D6AE`)
+                            .setThumbnail(`https://4zoneprofiles.com/wp-content/uploads/2022/08/Pupe.jpeg`)
                             .addFields(
                                 { name: '/pupe', value: 'คุยกับดิชั้น', inline: true },
                                 { name: '/role', value: 'ต้องการ Role', inline: true },
