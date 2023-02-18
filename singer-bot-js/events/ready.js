@@ -6,8 +6,8 @@ module.exports = {
 	name: 'ready',
 	once: true,
 	async execute(client) {
-		client.user.setActivity(`🖌 Pancake doing precious works`, {
-			type: ActivityType.Listening
+		client.user.setActivity(`🎤 Mobile need to sing a song `, {
+			type: ActivityType.Streaming
 		})
 	    console.log(`Logged in as ${client.user.tag}!`);
     },

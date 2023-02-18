@@ -8,12 +8,8 @@ module.exports = {
 		.setName('mobile')
 		.setDescription('Replies with Hi!'),
 	async execute(interaction) {
-        if(interaction.channelId==CH_SINGER) {
-            await interaction.reply(`อยากฟังเพลงอะไร! ${interaction.user}, บอก Mobile ได้นะคะ.`);
-            setTimeout(() => interaction.deleteReply(), 3000);
-        }else {
-            await interaction.reply(`Mobile รับคำสั่งได้แค่ห้อง singer-bot เท่านั้นนะคะ! ${interaction.user}.`);
-            setTimeout(() => interaction.deleteReply(), 3000);
-        }
+        let CH_SINGER_TEXT = interaction.guild.channels.cache.find(ch => ch.id === CH_SINGER);
+        await interaction.reply(`อยากฟังเพลงอะไร! ${interaction.user}, บอก Mobile ที่ ${CH_SINGER_TEXT} ได้นะคะ.`);
+        setTimeout(() => interaction.deleteReply(), 3000);
 	},
 };

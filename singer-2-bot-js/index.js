@@ -1,4 +1,5 @@
 const fs = require('node:fs');
+const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits, REST, Routes, ActivityType } = require('discord.js');
 const { config } = require('dotenv').config();
 const { DisTube } = require('distube');
@@ -64,19 +65,17 @@ const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 	}
 })();
 
-client.once(Events.ClientReady, c => {
-    client.user.setActivity(`Stang is listening`, { type: ActivityType.Listening });
-	console.log(`Logged in as ${client.user.tag}!`);
-});
-
-client.on(Events.MessageCreate, (context) => {
-	if(context.author.bot) {
-        return;
-    }
-	if(context.channelId==CH_SINGER && !context.content.startsWith('/')) {
-		context.delete();
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+for (const file of eventFiles) {
+	const filePath = path.join(eventsPath, file);
+	const event = require(filePath);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	} else {
+		client.on(event.name, (...args) => event.execute(...args));
 	}
-});
+}
 
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;

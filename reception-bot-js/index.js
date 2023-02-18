@@ -1,69 +1,75 @@
-const { Client, GatewayIntentBits, ActionRowBuilder, ActivityType, ButtonBuilder, ButtonStyle, Events, EmbedBuilder } = require('discord.js');
+const fs = require('node:fs');
+const path = require('node:path');
+const { Discord, Client, Collection, GatewayIntentBits, REST, Routes, Events } = require('discord.js');
 const { config } = require('dotenv').config();
+
+const CLIENT_ID = process.env.CLIENT_ID;
+const SERVER_ID = process.env.SERVER_ID;
+
 const client = new Client({ 
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.MessageContent
+        GatewayIntentBits.MessageContent,
     ] 
 });
 
-const CH_WELCOME_ID = process.env.CH_WELCOME_ID;
-const CH_GOODBYE_ID = process.env.CH_GOODBYE_ID;
+client.commandsPath = new Collection();
 
-const CH_INTRODUCTION_ID = process.env.CH_INTRODUCTION_ID
+const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
-const prefix = `>`
+const commandPrompt = ['fond'];
+const commandsPath = [];
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+	commandsPath.push(command.data.toJSON());
+    client.commandsPath.set(command.data.name, command);
+}
+(async () => {
+	try {
+		console.log(`Started refreshing ${commandsPath.length} application (/) commands.`);
+		// The put method is used to fully refresh all commands in the guild with the current set
+		const data = await rest.put(
+			Routes.applicationGuildCommands(CLIENT_ID, SERVER_ID),
+			{ body: commandsPath },
+		);
+		console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+	} catch (error) {
+		// And of course, make sure you catch and log any errors!
+		console.error(error);
+	}
+})();
 
-client.on('ready', () => {
-    client.user.setActivity(`${prefix} Fond is working`, { type: ActivityType.Listening });
-    console.log(`Logged in as ${client.user.tag}!`);
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+console.log(`Started refreshing ${eventFiles.length} application (/) events.`);
+for (const file of eventFiles) {
+	const filePath = path.join(eventsPath, file);
+	const event = require(filePath);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	} else {
+		client.on(event.name, (...args) => event.execute(...args));
+	}
+}
+
+client.on(Events.InteractionCreate, async interaction => {
+	if (interaction.isChatInputCommand()) {
+		const command = client.commandsPath.get(interaction.commandName);
+		if (!command) {
+			console.error(`No command matching ${interaction.commandName} was found.`);
+			return;
+		}
+		try {
+			await command.execute(interaction, client);
+		} catch (error) {
+			console.error(error);
+			interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+			setTimeout(() => interaction.deleteReply(), 5000);
+		}
+	}
 });
-
-client.on('messageCreate', (context) => {
-    if(context.author.bot) {
-        return;
-    }
-    if(context.channelId === CH_INTRODUCTION_ID) {
-        if(context.content.startsWith(`${prefix}`)) {
-            console.log('context', context);
-            if(context.content.toLowerCase() === `${prefix}fond`) {
-                context.reply('เรียกหนูทำไมคะ, คิดถึงหนูหรอ').then(msg => { setTimeout(() => msg.delete(), 5000 ) });
-            }
-            setTimeout(() => context.delete(), 3000)
-        }
-    }
-})
-
-client.on('guildMemberAdd', (context) => {
-    if(context.user.bot) {
-        return;
-    }
-    console.log('guildMemberAdd', context);
-    const embed = new EmbedBuilder()
-                        .setColor(0xC995C1)
-                        .setTitle(`${context.guild.name}`)
-                        .setDescription(`Welcome ${context.user} to server: ${context.guild.name}.`)
-                        .setThumbnail(`https://cdn.discordapp.com/avatars/${context.user.id}/${context.user.avatar}.png`)
-                        .setTimestamp()
-                        .setFooter({ text: `Powered by @cherMew`, iconURL: `https://cdn.discordapp.com/icons/${context.guild.id}/${context.guild.icon}.webp` });
-    context.guild.channels.cache.find(i => i.id == CH_WELCOME_ID).send({ embeds: [embed] });
-})
-
-client.on('guildMemberRemove', (context) => {
-    if(context.user.bot) {
-        return;
-    }
-    console.log('guildMemberRemove', context);
-    const embed = new EmbedBuilder()
-                        .setColor(0x3AC1B0)
-                        .setTitle(`${context.guild.name}`)
-                        .setDescription(`GoodBye ${context.user}, Good luck of your path.`)
-                        .setThumbnail(`https://cdn.discordapp.com/avatars/${context.user.id}/${context.user.avatar}.png`)
-                        .setTimestamp()
-                        .setFooter({ text: `Powered by @cherMew`, iconURL: `https://cdn.discordapp.com/icons/${context.guild.id}/${context.guild.icon}.webp` });
-    context.guild.channels.cache.find(i => i.id == CH_GOODBYE_ID).send({ embeds: [embed] });
-})
 
 client.login(process.env.TOKEN);

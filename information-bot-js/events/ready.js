@@ -19,7 +19,9 @@ module.exports = {
 	name: 'ready',
 	once: true,
 	async execute(client) {
-		client.user.setActivity(`Pampam is watching`, { type: ActivityType.Competing });
+		client.user.setActivity(`✒ Pampam is freedom myself`, {
+			type: ActivityType.Listening
+		})
 	    console.log(`Logged in as ${client.user.tag}!`);
 
         // Get the latest video
