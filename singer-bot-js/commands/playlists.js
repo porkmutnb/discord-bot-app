@@ -27,7 +27,7 @@ module.exports = {
             if(isOwner||isAdmin||isMember) {
                 let voiceChannel = interaction.member.voice.channel
                 if (!voiceChannel) {
-                    await interaction.reply({content: "เข้าไปจองห้อง Voice ไว้เลย, เดี๋ยว Stang ตามเข้าไป!"})
+                    await interaction.reply({content: "เข้าไปจองห้อง Voice ไว้เลย, เดี๋ยว Mobile ตามเข้าไป!"})
                     setTimeout(() => interaction.deleteReply(), 3000);
                 }else {
                     await interaction.deferReply().catch(err => {})
@@ -58,7 +58,7 @@ module.exports = {
                             setTimeout(() => interaction.deleteReply(), 3000);
                         }
                     }else {
-                        await interaction.followUp(`ตอนนี้ Stang ยังไม่สะดวก, โปรดลองใหม่ภายหลัง! ${interaction.user}.`);
+                        await interaction.followUp(`ตอนนี้ Mobile ยังไม่สะดวก, โปรดลองใหม่ภายหลัง! ${interaction.user}.`);
                         setTimeout(() => interaction.deleteReply(), 3000);
                     }
                 }
@@ -68,7 +68,7 @@ module.exports = {
             }
         }else {
             let CH_SINGER_TEXT = interaction.guild.channels.cache.find(ch => ch.id === CH_SINGER);
-            await interaction.reply(`อยากฟังเพลงอะไร! ${interaction.user}, บอก Stang ที่ ${CH_SINGER_TEXT} ได้นะคะ.`);
+            await interaction.reply(`อยากฟังเพลงอะไร! ${interaction.user}, บอก Mobile ที่ ${CH_SINGER_TEXT} ได้นะคะ.`);
             setTimeout(() => interaction.deleteReply(), 3000);
         }
     },

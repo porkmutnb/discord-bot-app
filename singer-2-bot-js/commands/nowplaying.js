@@ -4,6 +4,7 @@ const Discord = require("discord.js")
 const { config } = require('dotenv').config();
 
 const CH_SINGER = process.env.CH_SINGER;
+const SINGER_ID = process.env.SINGER_ID;
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -16,12 +17,15 @@ module.exports = {
             await interaction.followUp(`Stang ไม่พบเพลงใน Queue เพิ่มเพลงก่อนนะคะ`).catch(err => {});
             setTimeout(() => interaction.deleteReply(), 3000);
         }else {
+            const singerBot = interaction.member.guild.members.cache.find(m => m.id===SINGER_ID);
+            const username = queue.songs[0].user==undefined ? singerBot.user.username : queue.songs[0].user;
             const part = Math.floor((queue.currentTime / queue.songs[0].duration) * 20);
             const embed = new EmbedBuilder()
                         .setColor('#C995C1')
+                        .setImage(`${queue.songs[0].thumbnail}`)
                         .setDescription(`**[${queue.songs[0].name}](${queue.songs[0].url})**`)
                         .addFields({ name: 'Music Author:', value: `[${queue.songs[0].uploader.name}](${queue.songs[0].uploader.url})`, inline: true })
-                        .addFields({ name: 'Member:', value: `${queue.songs[0].user}`, inline: true })
+                        .addFields({ name: 'Member:', value: `${username}`, inline: true })
                         .addFields({ name: 'Voice:', value: `${queue.volume}%`, inline: true })
                         .addFields({ name: 'Views:', value: `${queue.songs[0].views}`, inline: true })
                         .addFields({ name: 'Like:', value: `${queue.songs[0].likes}`, inline: true })

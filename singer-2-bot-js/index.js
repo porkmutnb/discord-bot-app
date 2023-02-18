@@ -41,7 +41,7 @@ client.distube = new DisTube(client, {
 
 client.commands = new Collection();
 
-const songPrompt = ['play', 'add', 'nowplaying', 'loop', 'skip', 'volume', 'leave', 'playlists'];
+const songPrompt = ['play', 'add', 'nowplaying', 'loop', 'skip', 'volume', 'leave', 'playlists', 'formsplaylists'];
 const commands = [];
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
@@ -79,8 +79,7 @@ for (const file of eventFiles) {
 
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
-	console.log(interaction);
-    console.log(client.commands);
+	console.log('interaction', interaction);
     const command = client.commands.get(interaction.commandName);
 	if (!command) {
 		console.error(`No command matching ${interaction.commandName} was found.`);
@@ -94,7 +93,7 @@ client.on(Events.InteractionCreate, async interaction => {
 		}
 	} catch (error) {
 		console.error(error);
-		interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+		interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
 });
 
