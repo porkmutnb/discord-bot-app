@@ -8,7 +8,7 @@ const ADMIN_ID = process.env.ADMIN_ID;
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('setup')
-		.setDescription('Replies with Hi!'),
+		.setDescription('Command for Artist!'),
 	async execute(interaction, client) {
         console.log('interaction', interaction);
         await interaction.deferReply().catch(err => {});

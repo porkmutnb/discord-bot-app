@@ -8,7 +8,7 @@ const ADMIN_ID = process.env.ADMIN_ID;
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('setup')
-		.setDescription('Replies with Manual!'),
+		.setDescription('Command for Manager!'),
 	async execute(interaction, client) {
         await interaction.deferReply().catch(err => {});
         let isOwner = interaction.member.roles.cache.has(OWNER_ID);

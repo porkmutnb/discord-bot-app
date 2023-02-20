@@ -2,7 +2,7 @@ const { Discord, Client, GatewayIntentBits } = require('discord.js');
 const { getChannel } = require('simple-youtube-api');
 const { ActivityType } = require('discord.js');
 const { config } = require('dotenv').config();
-const { updateLatestVideoBNK, updateLatestVideoCGM } = require('../function/handle');
+const { updateLatestVideoBNK, updateLatestVideoCGM, updateLatestVideoUp2Mew } = require('../function/handle');
 const { renderSummaryCovid19 } = require('../function/reportCovid19');
 
 const client = new Client({ 
@@ -28,6 +28,7 @@ module.exports = {
         updateLatestVideoBNK(client);
         updateLatestVideoCGM(client);
         renderSummaryCovid19(client);
+        updateLatestVideoUp2Mew(client);
 
         // Schedule an interval to check for new videos
         /***** Every 1 Day *****/
@@ -45,6 +46,7 @@ module.exports = {
             updateLatestVideoBNK(client);
             updateLatestVideoCGM(client);
             renderSummaryCovid19(client);
+            updateLatestVideoUp2Mew(client);
         }, 60 * 60 * 1000);
         /***** Every minute *****/
         // setInterval(async () => {

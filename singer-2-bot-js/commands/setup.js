@@ -9,7 +9,7 @@ const MEMBER_ID = process.env.MEMBER_ID;
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('setup')
-		.setDescription('Replies with Manual!'),
+		.setDescription('Command for Singer-2!'),
 	async execute(interaction) {
         if(interaction.channelId==CH_SINGER) {
             let isOwner = interaction.member.roles.cache.has(OWNER_ID);

@@ -9,7 +9,7 @@ const ADMIN_ID = process.env.ADMIN_ID;
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('setup')
-		.setDescription('Replies with Manual!'),
+		.setDescription('Command for Assistance!'),
 	async execute(interaction) {
         await interaction.deferReply().catch(err => {});
         if(interaction.channelId==CH_INTRODUCTION_ID) {
