@@ -6,7 +6,7 @@ module.exports = {
 		.setName('hi')
 		.setDescription('Replies with Hi!'),
 	async execute(interaction, bot) {
-        let CH_MUSICBOT_TEXT = interaction.guild.channels.cache.find(ch => c.type === 0 &&  ch.name === process.env.CH_MUSICBOT_NAME);
+        let CH_MUSICBOT_TEXT = interaction.guild.channels.cache.find(c => c.type === 0 &&  c.name === process.env.CH_MUSICBOT_NAME);
 	const embed = new EmbedBuilder()
                 .setColor("#C995C1")
                 .setTitle(`ยินดีต้อนรับนะคะ`)
