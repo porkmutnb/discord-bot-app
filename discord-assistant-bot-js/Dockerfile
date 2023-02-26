@@ -12,4 +12,4 @@ RUN npm install
 COPY . /usr/src/discord-assistant-bot
 
 # Start the bot.
-CMD ["node", "index.js"]
+CMD ["node", "server.js"]

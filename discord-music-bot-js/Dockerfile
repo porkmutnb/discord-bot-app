@@ -12,4 +12,4 @@ RUN npm install
 COPY . /usr/src/discord-music-bot
 
 # Start the bot.
-CMD ["node", "index.js"]
+CMD ["node", "server.js"]

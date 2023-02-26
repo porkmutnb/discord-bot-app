@@ -7,7 +7,7 @@ create Dockerfile on project and code command bottom to this file
     RUN npm install
     COPY . /usr/src/bot
     # Start the bot.
-    CMD ["node", "index.js"]
+    CMD ["node", "server.js"]
 run command the next step by step
 
 docker build -t [discord-bot] .
