@@ -1,0 +1,16 @@
+{
+  "name": "discord-greeting-bot",
+  "version": "1.0.0",
+  "description": "greeting bot for discord.",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "author": "cherMew",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.7.1",
+    "dotenv": "^16.0.3",
+    "nodemon": "^2.0.20"
+  }
+}
