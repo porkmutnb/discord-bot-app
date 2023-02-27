@@ -12,7 +12,7 @@ module.exports.sendWelcomeMember = async (bot) => {
         }
         let welcomeCh = bot.guild.channels.cache.find(c => c.type === 0 && c.name.includes(process.env.CH_WELCOME_NAME))
         if(!welcomeCh) {
-            await bot.guild.channels.create({
+            welcomeCh = await bot.guild.channels.create({
                 name: `${process.env.CH_WELCOME_NAME}`,
                 type: 0,
                 parent: category.id,
@@ -79,7 +79,7 @@ module.exports.sendGoodBywMember = async (bot) => {
         }
         let goodbyeCh = bot.guild.channels.cache.find(c => c.type === 0 && c.name.includes(process.env.CH_GOODBYE_NAME))
         if(!goodbyeCh) {
-            await bot.guild.channels.create({
+            goodbyeCh = await bot.guild.channels.create({
                 name: `${process.env.CH_GOODBYE_NAME}`,
                 type: 0,
                 parent: category.id,
