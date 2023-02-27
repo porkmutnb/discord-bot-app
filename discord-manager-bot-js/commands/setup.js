@@ -9,14 +9,14 @@ module.exports = {
 	async execute(interaction, client) {
         const ownerRole = interaction.member.guild.roles.cache.find(role => role.name === process.env.ROLE_OWNER_NAME);
         const adminRole = interaction.member.guild.roles.cache.find(role => role.name === process.env.ROLE_ADMIN_NAME);
-        let isOwner = interaction.member.roles.cache.has(ownerRole.id);
-        let isAdmin = interaction.member.roles.cache.has(adminRole.id);
+        let isOwner = ownerRole==undefined ? true : interaction.member.roles.cache.has(ownerRole.id);
+        let isAdmin = adminRole==undefined ? true : interaction.member.roles.cache.has(adminRole.id);
         let resMsg = ``;
         if(isOwner||isAdmin) {
             await getAllMembers(interaction, client);
             resMsg = `Commands is ready...`
         }else {
-            resMsg = `คำสั่งนี้สงวนไว้เฉพาะ ${ownerRole} ${adminRole} เท่านั้นนะคะ ${interaction.user}`
+            resMsg = `คำสั่งนี้สงวนไว้เฉพาะ ${ownerRole==undefined ? 'Ownere' : ownerRole} ${adminRole==undefined ? 'Admin' : adminRole} เท่านั้นนะคะ ${interaction.user}`
         }
         const embed = new EmbedBuilder()
                             .setColor("#C995C1")

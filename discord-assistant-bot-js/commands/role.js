@@ -8,7 +8,7 @@ module.exports = {
         .addStringOption(option =>
             option.setName('role')
                 .setDescription('What your need Role?')
-                .setRequired(true)
+                .setRequired(false)
                 .addChoices(
                     { name: 'Fanclub 48 Group', value: 'OTA' },
                     { name: 'Member', value: 'Member' },
@@ -27,24 +27,36 @@ module.exports = {
                 .setRequired(false)),
 	async execute(interaction) {
         try {
+            let RoleList = ['OTA', 'Member', 'GTA', 'RDR', 'MINECRAFT', 'GAMER'];
+            interaction.member.guild.roles.cache.find(role => {
+                if(!RoleList.includes(role.name)) {
+                    RoleList.push(role.name)
+                }
+            });
             let name = interaction.options.getString('name');
             let role = interaction.options.getString('role');
             let oshi = interaction.options.getString('oshi');
-            role = ['OTA', 'Member', 'GTA', 'RDR', 'MINECRAFT', 'GAMER'].includes(role) ? role : `Member`;
-            console.log('=>', name, role);
+            role = RoleList.includes(role) ? role : `Member`;
             const ROLE_ADD = interaction.member.guild.roles.cache.find(r => r.name === role);
-            if(role===`OTA`) {
-                let yourOshi = (oshi==null) ? `` : (oshi.length>10) ? oshi.substring(0, 10)+`...` : oshi.substring(0, oshi.length);
-                let username = (yourOshi===``) ? name : name+`|`+yourOshi;
-                interaction.guild.members.cache.get(interaction.member.user.id).setNickname(username);
+            if(ROLE_ADD==undefined) {
+                await interaction.followUp(`${ROLE_ADD} นี้ไม่มีใน Server: ${interaction.guild.name}, โปรดติดต่อแอดมินของเซิร์ฟเวอร์ค่ะ`);
+                setTimeout(() => interaction.deleteReply(), 5000);
             }else {
-                interaction.guild.members.cache.get(interaction.member.user.id).setNickname(name);
+                if(role===`OTA`) {
+                    let yourOshi = (oshi==null) ? `` : (oshi.length>10) ? oshi.substring(0, 10)+`...` : oshi.substring(0, oshi.length);
+                    let username = (yourOshi===``) ? name : name+`|`+yourOshi;
+                    interaction.guild.members.cache.get(interaction.member.user.id).setNickname(username);
+                }else {
+                    interaction.guild.members.cache.get(interaction.member.user.id).setNickname(name);
+                }
+                interaction.guild.members.cache.get(interaction.member.user.id).roles.add(ROLE_ADD);
+                await interaction.followUp(`${interaction.member.user}เพิ่ม Role ${ROLE_ADD} ให้นายท่านเรียบร้อยแล้วค่ะ`);
+                setTimeout(() => interaction.deleteReply(), 5000);
             }
-            interaction.guild.members.cache.get(interaction.member.user.id).roles.add(ROLE_ADD);
-            await interaction.followUp(`${interaction.member.user}เพิ่ม Role ${ROLE_ADD} ให้นายท่านเรียบร้อยแล้วค่ะ`);
-            setTimeout(() => interaction.deleteReply(), 5000);
         } catch (error) {
             console.error('Error AddRole:SlashCommand:', error);
+            await interaction.followUp({ content: `มีบางอย่างผิดพลาด, ลองใหม่ภายหลัง ${interaction.user}` });
+            setTimeout(() => interaction.deleteReply(), 6000);
         }
     },
 };

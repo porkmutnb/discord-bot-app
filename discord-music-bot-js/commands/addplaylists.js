@@ -10,9 +10,9 @@ module.exports = {
         const ownerRole = interaction.member.guild.roles.cache.find(role => role.name === process.env.ROLE_OWNER_NAME);
         const adminRole = interaction.member.guild.roles.cache.find(role => role.name === process.env.ROLE_ADMIN_NAME);
         const serverBooster = interaction.member.guild.roles.cache.find(role => role.name === process.env.ROLE_SERVERBOOSTER_NAME);
-        let isOwner = interaction.member.roles.cache.has(ownerRole.id);
-        let isAdmin = interaction.member.roles.cache.has(adminRole.id);
-        let isServerBooster = interaction.member.roles.cache.has(serverBooster.id);
+        let isOwner = ownerRole==undefined ? true : interaction.member.roles.cache.has(ownerRole.id);
+        let isAdmin = adminRole==undefined ? true : interaction.member.roles.cache.has(adminRole.id);
+        let isServerBooster = serverBooster==undefined ? false : interaction.member.roles.cache.has(serverBooster.id);
         if(isOwner||isAdmin||isServerBooster) {
             interaction.user.send(`แบบฟอร์มสำหรับทำลิสต์เพลงสำหรับเซิฟเวอร์ ${interaction.member.guild.name} => ${process.env.GOOGLE_SHEET_URL}`);
             resMsg = `ส่งแบบฟอร์มทำลิสต์เพลงของเซิฟเวอร์ ${interaction.member.guild.name} เรียบร้อยแล้วค่ะ`

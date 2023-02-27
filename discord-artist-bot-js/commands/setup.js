@@ -9,8 +9,8 @@ module.exports = {
         let resMsg = ``;
         const ownerRole = interaction.member.guild.roles.cache.find(role => role.name === process.env.ROLE_OWNER_NAME);
         const adminRole = interaction.member.guild.roles.cache.find(role => role.name === process.env.ROLE_ADMIN_NAME);
-        let isOwner = interaction.member.roles.cache.has(ownerRole.id);
-        let isAdmin = interaction.member.roles.cache.has(adminRole.id);
+        let isOwner = ownerRole==undefined ? true : interaction.member.roles.cache.has(ownerRole.id);
+        let isAdmin = adminRole==undefined ? true : interaction.member.roles.cache.has(adminRole.id);
         if(isOwner||isAdmin) {
             const embed = new EmbedBuilder()
 						.setColor(0xC995C1)
@@ -21,14 +21,14 @@ module.exports = {
 							{ name: '/hi', value: 'คุยกับหนู', inline: true },
 							{ name: '/imagine', value: 'อยากได้ภาพอะไรบอกหนูสิ', inline: true },
 							{ name: '/translate', value: `อยากได้ล่ามภาษามั้ยคะ`, inline: true },
-							{ name: '/setup', value: `Command for me [only ${ownerRole}, ${adminRole}]`, inline: false }
+							{ name: '/setup', value: `Command for me [only ${ownerRole==undefined ? 'Ownere' : ownerRole} ${adminRole==undefined ? 'Admin' : adminRole}]`, inline: false }
 						)
 						.setImage(`https://i.pinimg.com/originals/89/80/aa/8980aad5866ff9d7d8c42280a0e58d52.gif`)
 						.setTimestamp()
 						.setFooter({ text: 'Powerd be cherMew', iconURL: `https://cdn.discordapp.com/icons/${interaction.guild.id}/${interaction.guild.icon}.webp` });
             await interaction.followUp({ embeds: [embed] });
         }else {
-            resMsg = `คำสั่งนี้สงวนไว้เฉพาะ ${ownerRole} ${adminRole} เท่านั้นนะคะ ${interaction.user}`
+            resMsg = `คำสั่งนี้สงวนไว้เฉพาะ ${ownerRole==undefined ? 'Ownere' : ownerRole} ${adminRole==undefined ? 'Admin' : adminRole} เท่านั้นนะคะ ${interaction.user}`
             const embed = new EmbedBuilder()
                             .setColor("#C995C1")
                             .setTitle(`หนูรับทราบค่ะ`)

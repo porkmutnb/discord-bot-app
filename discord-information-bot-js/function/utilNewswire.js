@@ -89,6 +89,11 @@ module.exports.updateLatestVideoBNK = async (client) => {
         }
     }else {
         console.log(`Not found text channel ${process.env.CH_NEWSWIREBNK_NAME} for update lasted video from BNK48 Official`);
+        try {
+            client.guild.channels.cache.find(i => i.type === 0).send({ content: `Not found text channel, Please add this text channel ${process.env.CH_NEWSWIREBNK_NAME}` });
+        } catch (error) {
+            console.log(`Not found all text channel ${process.env.CH_NEWSWIREBNK_NAME} in ${client.guild.name}`);
+        }
     }
 }
 
@@ -170,6 +175,11 @@ module.exports.updateLatestVideoCGM = async (client) => {
         }
     }else {
         console.log(`Not found text channel ${process.env.CH_NEWSWIRECGM_NAME} for update lasted video from CGM48 Official`);
+        try {
+            client.guild.channels.cache.find(i => i.type === 0).send({ content: `Not found text channel, Please add this text channel ${process.env.CH_NEWSWIRECGM_NAME}` });
+        } catch (error) {
+            console.log(`Not found all text channel ${process.env.CH_NEWSWIRECGM_NAME} in ${client.guild.name}`);
+        }
     }
 }
 
@@ -246,6 +256,11 @@ module.exports.updateLatestVideoUp2Mew = async (client) => {
         }
     }else {
         console.log(`Not found text channel ${process.env.CH_NEWSWIREUP2MEW_NAME} for update lasted video from UP2MEW Channel`);
+        try {
+            client.guild.channels.cache.find(i => i.type === 0).send({ content: `Not found text channel, Please add this text channel ${process.env.CH_NEWSWIREUP2MEW_NAME}` });
+        } catch (error) {
+            console.log(`Not found all text channel ${process.env.CH_NEWSWIREUP2MEW_NAME} in ${client.guild.name}`);
+        }
     }
 }
 
@@ -289,5 +304,10 @@ module.exports.updateReportCovid19 = async (client) => {
         }
     }else {
         console.log(`Not found text channel ${process.env.CH_NEWSWIRECOVID19_NAME} for update report covid19 from api.covid19api`);
+        try {
+            client.guild.channels.cache.find(i => i.type === 0).send({ content: `Not found text channel, Please add this text channel ${process.env.CH_NEWSWIRECOVID19_NAME}` });
+        } catch (error) {
+            console.log(`Not found all text channel ${process.env.CH_NEWSWIRECOVID19_NAME} in ${client.guild.name}`);
+        }
     }
 }

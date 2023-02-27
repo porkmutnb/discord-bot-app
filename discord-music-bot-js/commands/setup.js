@@ -10,8 +10,8 @@ module.exports = {
         const adminRole = interaction.member.guild.roles.cache.find(role => role.name === process.env.ROLE_ADMIN_NAME);
         const memberRole = interaction.member.guild.roles.cache.find(role => role.name === process.env.ROLE_MEMBER_NAME);
         const serverBooster = interaction.member.guild.roles.cache.find(role => role.name === process.env.ROLE_SERVERBOOSTER_NAME);
-        let isOwner = interaction.member.roles.cache.has(ownerRole.id);
-        let isAdmin = interaction.member.roles.cache.has(adminRole.id);
+        let isOwner = ownerRole==undefined ? true : interaction.member.roles.cache.has(ownerRole.id);
+        let isAdmin = adminRole==undefined ? true : interaction.member.roles.cache.has(adminRole.id);
         let resMsg = ``;
         if(isOwner||isAdmin) {
             const embed = new EmbedBuilder()
@@ -35,7 +35,7 @@ module.exports = {
                     .setFooter({ text: 'Powerd be cherMew', iconURL: `https://cdn.discordapp.com/icons/${interaction.guild.id}/${interaction.guild.icon}.webp` });
             await interaction.followUp({embeds: [embed]});
         }else {
-            resMsg = `คำสั่งนี้สงวนไว้เฉพาะ ${ownerRole} ${adminRole} เท่านั้นนะคะ ${interaction.user}`
+            resMsg = `คำสั่งนี้สงวนไว้เฉพาะ ${ownerRole==undefined ? 'Ownere' : ownerRole} ${adminRole==undefined ? 'Admin' : adminRole} เท่านั้นนะคะ ${interaction.user}`
             const embed = new EmbedBuilder()
                             .setColor("#C995C1")
                             .setTitle(`หนูรับทราบค่ะ`)

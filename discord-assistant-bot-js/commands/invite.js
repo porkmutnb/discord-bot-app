@@ -8,13 +8,13 @@ module.exports = {
 	async execute(interaction) {
         const ownerRole = interaction.member.guild.roles.cache.find(role => role.name === process.env.ROLE_OWNER_NAME);
         const adminRole = interaction.member.guild.roles.cache.find(role => role.name === process.env.ROLE_ADMIN_NAME);
-        const memberBooster = interaction.member.guild.roles.cache.find(role => role.name === process.env.ROLE_MEMBER_NAME);
-        const serverBooster = interaction.member.guild.roles.cache.find(role => role.name === process.env.ROLE_SERVERBOOSTER_NAME);
+        const memberRole = interaction.member.guild.roles.cache.find(role => role.name === process.env.ROLE_MEMBER_NAME);
+        const serverBoosterRole = interaction.member.guild.roles.cache.find(role => role.name === process.env.ROLE_SERVERBOOSTER_NAME);
         let = resMsg = ``
-        let isOwner = interaction.member.roles.cache.has(ownerRole.id);
-        let isAdmin = interaction.member.roles.cache.has(adminRole.id);
-        let isMember = interaction.member.roles.cache.has(memberBooster.id);
-        let isServerBooster = interaction.member.roles.cache.has(serverBooster.id);
+        let isOwner = ownerRole==undefined ? true : interaction.member.roles.cache.has(ownerRole.id);
+        let isAdmin = adminRole==undefined ? true : interaction.member.roles.cache.has(adminRole.id);
+        let isMember = memberRole==undefined ? true : interaction.member.roles.cache.has(memberRole.id);
+        let isServerBooster = serverBoosterRole==undefined ? false : interaction.member.roles.cache.has(serverBoosterRole.id);
         if(isOwner||isAdmin||isMember||isServerBooster) {
             await interaction.channel.createInvite(
                 {
@@ -28,7 +28,7 @@ module.exports = {
                 resMsg = `ส่งคำเชิญเข้าเซิฟของ ${interaction.member.guild.name} เรียบร้อยแล้วค่ะ`
             });
         }else {
-            resMsg = `คำสั่งนี้สงวนไว้เฉพาะ ${ownerRole} ${adminRole} ${memberBooster} ${serverBooster} เท่านั้นนะคะ ${interaction.user}`
+            resMsg = `คำสั่งนี้สงวนไว้เฉพาะ ${ownerRole==undefined ? 'Ownere' : ownerRole} ${adminRole==undefined ? 'Admin' : adminRole} ${memberRole==undefined ? 'Member' : memberRole} ${serverBoosterRole==undefined ? 'Server Booster' : serverBoosterRole} เท่านั้นนะคะ ${interaction.user}`
         }
         const embed = new EmbedBuilder()
                         .setColor("#C995C1")
