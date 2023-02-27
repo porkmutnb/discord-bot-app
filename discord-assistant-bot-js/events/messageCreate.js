@@ -4,10 +4,9 @@ require('dotenv').config();
 module.exports = {
     name: 'messageCreate',
 	async execute(bot) {
-        if(bot.author.bot) {
-            return;
-        }else {
-            const introductionCh = bot.guild.channels.cache.find(c => c.type===0 && c.name === process.env.CH_INTRODUCTION_NAME)
+        if(bot.author.bot)  return;
+        const introductionCh = bot.guild.channels.cache.find(c => c.type===0 && c.name === process.env.CH_INTRODUCTION_NAME)
+        if(introductionCh) {
             const message = bot.content
             if(introductionCh.id===bot.channelId) {
                 const embed = new EmbedBuilder()

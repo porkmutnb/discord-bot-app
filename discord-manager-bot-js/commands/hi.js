@@ -5,7 +5,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('hi')
 		.setDescription('Replies with Hi!'),
-	async execute(interaction, client) {
+	async execute(interaction) {
                 const embed = new EmbedBuilder()
                         .setColor("#C995C1")
                         .setTitle(`ยินดีต้อนรับนะคะ`)

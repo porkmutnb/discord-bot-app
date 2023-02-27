@@ -14,7 +14,7 @@ module.exports = {
                     option.setName('to')
                         .setDescription('to language')
                         .setRequired(true)),
-	async execute(interaction, client) {
+	async execute(interaction) {
         const text = interaction.options.getString('text')
         const to = interaction.options.getString('to')
         if(text==null || to==null) {
@@ -35,9 +35,13 @@ module.exports = {
                                     .setFooter({ text: 'Powerd be cherMew', iconURL: `https://cdn.discordapp.com/icons/${interaction.guild.id}/${interaction.guild.icon}.webp` });
 
                     let CH_INTRODUCTION = interaction.guild.channels.cache.find(c => c.type === 0 &&  c.name === process.env.CH_INTRODUCTION_NAME);
-                    if(interaction.channelId==CH_INTRODUCTION.id) {
-                        await interaction.followUp({ content: `${interaction.user}`, embeds: [embed] });
-                        setTimeout(() => interaction.deleteReply(), 6000);
+                    if(CH_INTRODUCTION) {
+                        if(interaction.channelId==CH_INTRODUCTION.id) {
+                            await interaction.followUp({ content: `${interaction.user}`, embeds: [embed] });
+                            setTimeout(() => interaction.deleteReply(), 6000);
+                        }else {
+                            await interaction.followUp({ content: `${interaction.user}`, embeds: [embed] });
+                        }
                     }else {
                         await interaction.followUp({ content: `${interaction.user}`, embeds: [embed] });
                     }

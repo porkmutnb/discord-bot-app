@@ -16,7 +16,7 @@ module.exports = {
             option.setName('keyword')
                 .setDescription('keyword image')
                 .setRequired(true)),
-	async execute(interaction, client) {
+	async execute(interaction) {
         const keyword = interaction.options.getString('keyword')
         if(keyword===null) {
             await interaction.followUp(`คุณพี่ลืมใส่ความต้องการให้หนูนะ ${interaction.user}`);
@@ -38,9 +38,13 @@ module.exports = {
                                 .setFooter({ text: 'Powerd be cherMew', iconURL: `https://cdn.discordapp.com/icons/${interaction.guild.id}/${interaction.guild.icon}.webp` });
                 
                 let CH_INTRODUCTION = interaction.guild.channels.cache.find(c => c.type === 0 &&  c.name === process.env.CH_INTRODUCTION_NAME);
-                if(interaction.channelId==CH_INTRODUCTION.id) {
-                    await interaction.followUp({ content: `นี่นะคะรูปของคุณพี่ ${interaction.user}`, embeds: [embed] });
-                    setTimeout(() => interaction.deleteReply(), 6000);
+                if(CH_INTRODUCTION) {
+                    if(interaction.channelId==CH_INTRODUCTION.id) {
+                        await interaction.followUp({ content: `นี่นะคะรูปของคุณพี่ ${interaction.user}`, embeds: [embed] });
+                        setTimeout(() => interaction.deleteReply(), 6000);
+                    }else {
+                        await interaction.followUp({ content: `นี่นะคะรูปของคุณพี่ ${interaction.user}`, embeds: [embed] });
+                    }
                 }else {
                     await interaction.followUp({ content: `นี่นะคะรูปของคุณพี่ ${interaction.user}`, embeds: [embed] });
                 }

@@ -15,7 +15,6 @@ module.exports = {
         if (!queue) {
             resMsg = `หนูไม่พบเพลงใน Queue เพิ่มเพลงก่อนนะคะ`
         }else {
-            
             if(volume==1) {
                 resMsg = `(เล่นซ้ำเพลงเดิม)`;
                 bot.distube.setRepeatMode(interaction, 1);

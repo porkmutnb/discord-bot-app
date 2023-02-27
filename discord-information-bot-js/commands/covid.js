@@ -12,7 +12,7 @@ module.exports = {
             option.setName('country_code')
                 .setDescription('countryCode in your need')
                 .setRequired(true)),
-    async execute(interaction, client) {
+    async execute(interaction) {
         const countryCode = interaction.options.getString('country_code').toString().toUpperCase();
         let data = await getCovidSummaryByCountry(countryCode);
         const exampleEmbed = {

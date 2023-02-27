@@ -1,0 +1,49 @@
+{
+    "roleList": [
+        {
+            "name":"Owner",
+            "reason": "Role special",
+            "color": "#C995C1"
+        },
+        {
+            "name":"Admin",
+            "reason": "Role secondary",
+            "color": "#3AC1B0"
+        },
+        {
+            "name":"Friend",
+            "reason": "Role friend",
+            "color": "#FFFF00"
+        },
+        {
+            "name":"OTA",
+            "reason": "Role fanclub 48 group",
+            "color": "#9B59B6"
+        },
+        {
+            "name":"Member",
+            "reason": "Role member",
+            "color": "#3498DB"
+        },
+        {
+            "name":"GTA",
+            "reason": "Role game gta",
+            "color": "#57F287"
+        },
+        {
+            "name":"RDR",
+            "reason": "Role game rdr",
+            "color": "#57F287"
+        },
+        {
+            "name":"MINECRAFT",
+            "reason": "Role game minecraft",
+            "color": "#57F287"
+        },
+        {
+            "name":"GAMER",
+            "reason": "Role game all",
+            "color": "#1F8B4C"
+        }
+    ]
+}

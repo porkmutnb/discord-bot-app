@@ -10,7 +10,6 @@ module.exports = {
 			type: ActivityType.Listening
 		})
 	    console.log(`Logged in as ${bot.user.tag}!`);
-
         // Get the latest video
         updateLatestVideoBNK(bot);
         updateLatestVideoCGM(bot);

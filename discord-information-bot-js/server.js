@@ -54,21 +54,4 @@ for (const file of eventFiles) {
 	}
 }
 
-bot.on(Events.InteractionCreate, async interaction => {
-	if (!interaction.isChatInputCommand()) return;
-    const command = bot.commands.get(interaction.commandName);
-	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`);
-		return;
-	}
-	try {
-        await interaction.deferReply().catch(err => {});
-		await command.execute(interaction, bot);
-	} catch (error) {
-		console.error(error);
-        await interaction.deferReply().catch(err => {});
-		interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-	}
-});
-
 bot.login(process.env.TOKEN);

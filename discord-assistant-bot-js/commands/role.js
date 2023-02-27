@@ -1,62 +1,73 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
+const { prepareServerAuthor } = require('../function/utilAssistant');
 require('dotenv').config();
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('role')
-		.setDescription('Want your Role')
-        .addStringOption(option =>
-            option.setName('role')
-                .setDescription('What your need Role?')
-                .setRequired(false)
-                .addChoices(
-                    { name: 'Fanclub 48 Group', value: 'OTA' },
-                    { name: 'Member', value: 'Member' },
-                    { name: 'Grand Theft Auto', value: 'GTA' },
-                    { name: 'Red Dead Redemtion', value: 'RDR' },
-                    { name: 'Minecraft', value: 'MINECRAFT' },
-                    { name: 'Game All', value: 'GAMER' },
-                ))
-        .addStringOption(option =>
-            option.setName('name')
-                .setDescription('What is your name?')
-                .setRequired(true))
-        .addStringOption(option =>
-            option.setName('oshi')
-                .setDescription('What is your oshi name [สำหรับคนที่เลือก Role: OTA]?')
-                .setRequired(false)),
+		.setDescription('Are you need Role?'),
 	async execute(interaction) {
         try {
-            let RoleList = ['OTA', 'Member', 'GTA', 'RDR', 'MINECRAFT', 'GAMER'];
-            interaction.member.guild.roles.cache.find(role => {
-                if(!RoleList.includes(role.name)) {
-                    RoleList.push(role.name)
-                }
-            });
-            let name = interaction.options.getString('name');
-            let role = interaction.options.getString('role');
-            let oshi = interaction.options.getString('oshi');
-            role = RoleList.includes(role) ? role : `Member`;
-            const ROLE_ADD = interaction.member.guild.roles.cache.find(r => r.name === role);
-            if(ROLE_ADD==undefined) {
-                await interaction.followUp(`${ROLE_ADD} นี้ไม่มีใน Server: ${interaction.guild.name}, โปรดติดต่อแอดมินของเซิร์ฟเวอร์ค่ะ`);
-                setTimeout(() => interaction.deleteReply(), 5000);
-            }else {
-                if(role===`OTA`) {
-                    let yourOshi = (oshi==null) ? `` : (oshi.length>10) ? oshi.substring(0, 10)+`...` : oshi.substring(0, oshi.length);
-                    let username = (yourOshi===``) ? name : name+`|`+yourOshi;
-                    interaction.guild.members.cache.get(interaction.member.user.id).setNickname(username);
-                }else {
-                    interaction.guild.members.cache.get(interaction.member.user.id).setNickname(name);
-                }
-                interaction.guild.members.cache.get(interaction.member.user.id).roles.add(ROLE_ADD);
-                await interaction.followUp(`${interaction.member.user}เพิ่ม Role ${ROLE_ADD} ให้นายท่านเรียบร้อยแล้วค่ะ`);
-                setTimeout(() => interaction.deleteReply(), 5000);
+            // console.log('interaction', interaction);
+            let resMsg = ``
+            let roleNotUseList = []
+            if(interaction.member.guild.ownerId===process.env.OWNER_SERVER_ID) {
+                roleNotUseList = await prepareServerAuthor(interaction.member.guild)
             }
+            let ButtonRole = []
+            await interaction.member.guild.roles.cache.find(r => {
+                if(!['@everyone','Owner'.toLowerCase(),'Admin'.toLowerCase()].includes(r.name.toLowerCase()) && r.tags.botId==undefined && !roleNotUseList.includes(r.name)) {
+                    let BtnStyle
+                    if(r.name==`Member`) {
+                        BtnStyle = ButtonStyle.Primary
+                    }else if(r.name==`OTA`) {
+                        BtnStyle = ButtonStyle.Success
+                    }else if(r.name==`Friend`) {
+                        BtnStyle = ButtonStyle.Danger
+                    }else if(['GAMER','MINECRAFT','RDR','GTA'].includes(r.name)) {
+                        BtnStyle = ButtonStyle.Secondary
+                    }else {
+                        BtnStyle = ButtonStyle.Success
+                    }
+                    const isUserRole = interaction.member.roles.cache.has(r.id);
+                    const ROLE = new ActionRowBuilder().addComponents(
+                                    new ButtonBuilder()
+                                        .setCustomId(`${r.name}`)
+                                        .setLabel(`${r.name}`)
+                                        .setDisabled(isUserRole ? true : false)
+                                        .setStyle(BtnStyle),
+                    );
+                    ButtonRole.push(ROLE)
+                }
+            })
+            if(ButtonRole.length>0) {
+                for (let index = 0; index < ButtonRole.length; index++) {
+                    const element = ButtonRole[index];
+                    await interaction.member.guild.channels.cache.find(i => i.id == interaction.channelId).send({ components: [element] }).then(msg => setTimeout(() => msg.delete(), 10000));
+                }
+                resMsg =`ต้องการ Role หรือคะ นายท่าน,`
+                await interaction.followUp({content: `${resMsg}`});
+            }else {
+                resMsg =`ไม่พบ Role ใน Server นี้, โปรดติดต่อแอดมิน`
+                const embed = new EmbedBuilder()
+                        .setColor("#C995C1")
+                        .setTitle(`หนูรับทราบค่ะ`)
+                        .setDescription(`${resMsg}`)
+                        .setTimestamp()
+                        .setFooter({ text: 'Powerd be cherMew', iconURL: `https://cdn.discordapp.com/icons/${interaction.guild.id}/${interaction.guild.icon}.webp` });
+                await interaction.followUp({embeds: [embed]});
+            }
+            setTimeout(() => interaction.deleteReply(), 3000);
         } catch (error) {
-            console.error('Error AddRole:SlashCommand:', error);
-            await interaction.followUp({ content: `มีบางอย่างผิดพลาด, ลองใหม่ภายหลัง ${interaction.user}` });
-            setTimeout(() => interaction.deleteReply(), 6000);
+            console.error('Error role:SlashCommand:', error);
+            const embed = new EmbedBuilder()
+                        .setColor("#C995C1")
+                        .setTitle(`หนูรับทราบค่ะ`)
+                        .setDescription(`มีบางอย่างผิดพลาด, ลองใหม่ภายหลัง ${interaction.user}`)
+                        .setTimestamp()
+                        .setFooter({ text: 'Powerd be cherMew', iconURL: `https://cdn.discordapp.com/icons/${interaction.guild.id}/${interaction.guild.icon}.webp` });
+            await interaction.followUp({embeds: [embed]});
+            setTimeout(() => interaction.deleteReply(), 3000);
         }
     },
 };
