@@ -16,7 +16,7 @@ module.exports = {
             }
             let ButtonRole = []
             await interaction.member.guild.roles.cache.find(r => {
-                if(!['@everyone','Owner'.toLowerCase(),'Admin'.toLowerCase()].includes(r.name.toLowerCase()) && r.tags.botId==undefined && !roleNotUseList.includes(r.name)) {
+                if(!['@everyone','Owner'.toLowerCase(),'Admin'.toLowerCase()].includes(r.name.toLowerCase()) && r.tags.botId==null && !roleNotUseList.includes(r.name)) {
                     let BtnStyle
                     if(r.name==`Member`) {
                         BtnStyle = ButtonStyle.Primary
