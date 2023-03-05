@@ -1,9 +1,4 @@
 const { Client, Collection, Events, GatewayIntentBits, REST, Routes } = require("discord.js");
-const { SoundCloudPlugin } = require('@distube/soundcloud')
-const { SpotifyPlugin } = require('@distube/spotify')
-const { YtDlpPlugin } = require('@distube/yt-dlp')
-const { Player } = require("discord-player");
-const { DisTube } = require('distube');
 const { readdirSync } = require("fs");
 const path = require('node:path');
 require('dotenv').config();
@@ -16,23 +11,6 @@ const bot = new Client({ intents: [
         GatewayIntentBits.MessageContent
     ]
 });
-
-const player = new Player(bot);
-bot.player = player;
-bot.distube = new DisTube(bot, {
-    leaveOnStop: false,
-    leaveOnFinish: true,
-    emitNewSongOnly: true,
-    emitAddSongWhenCreatingQueue: false,
-    emitAddListWhenCreatingQueue: false,
-    plugins: [
-        new SpotifyPlugin({
-            emitEventsAfterFetching: true
-        }),
-        new SoundCloudPlugin(),
-        new YtDlpPlugin()
-    ]
-})
 
 const commands = [];
 bot.commands = new Collection();
@@ -78,6 +56,7 @@ for (const file of eventFiles) {
 }
 
 bot.on(Events.InteractionCreate, async interaction => {
+	console.log('interaction', interaction);
 	if (!interaction.isChatInputCommand()) return;
     const command = bot.commands.get(interaction.commandName);
 	if (!command) {
@@ -89,6 +68,7 @@ bot.on(Events.InteractionCreate, async interaction => {
 		await command.execute(interaction, bot);
 	} catch (error) {
 		console.error(error);
+		await interaction.deferReply().catch(err => {});
 		interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
 });

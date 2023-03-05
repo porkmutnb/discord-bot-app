@@ -5,7 +5,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('hi')
 		.setDescription('Replies with Hi!'),
-	async execute(interaction, bot) {
+	async execute(interaction, bot, serverQueue) {
                 let CH_MUSICBOT_TEXT = interaction.guild.channels.cache.find(c => c.type === 0 &&  c.name === process.env.CH_MUSICBOT_NAME);
                 const embed = new EmbedBuilder()
                         .setColor("#C995C1")
