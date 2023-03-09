@@ -1,14 +1,20 @@
 const { EmbedBuilder } = require('discord.js');
 const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, entersState, NoSubscriberBehavior , StreamType, AudioPlayerStatus, VoiceConnectionStatus } = require('@discordjs/voice')
 const ytdl = require('ytdl-core')
+const ffmpeg = require('ffmpeg')
 require('dotenv').config()
+const fs = require('fs')
 
-const audioPlayer = createAudioPlayer()
+global.filename = 'video.mp4'
+global.connection = null
+global.audioPlayer = createAudioPlayer()
 global.songcurrent = ``
 global.songList = []
+global.volume = 50
 global.loop = 0
 
 module.exports.play = async (interaction, songList) => {
+    let isSuccess = false
     let isBotAvailable = true;
     await interaction.member.guild.channels.cache.filter(async ch => {
         if(ch.type===2) {
@@ -32,7 +38,7 @@ module.exports.play = async (interaction, songList) => {
             setTimeout(() => interaction.deleteReply(), 3000);
         }else {
             // เข้าร่วมช่องเสียง
-            const connection = await joinVoiceChannel({
+            global.connection = await joinVoiceChannel({
                 channelId: voiceChannel.id,
                 guildId: voiceChannel.guild.id,
                 adapterCreator: voiceChannel.guild.voiceAdapterCreator,
@@ -43,72 +49,36 @@ module.exports.play = async (interaction, songList) => {
             if(global.loop==2) {
                 global.songList.push(song)
             }
-            // สร้าง AudioResource จาก URL ของเพลงที่ต้องการเล่น
-            const tracks = await ytdl.getInfo(song);
-            const stream = await ytdl.downloadFromInfo(tracks, { filter: 'audioonly' });
-            const resource = createAudioResource(stream, { inputType: StreamType.Arbitrary });
-            // เล่นเพลง
-            audioPlayer.play(resource);
-            connection.subscribe(audioPlayer);
-            // เมื่อเพลงเล่นเสร็จสิ้น หรือมีปัญหาขึ้น
-            audioPlayer.on(AudioPlayerStatus.Playing, () => {
-                console.log('Playing...');
-            });
-            audioPlayer.on(AudioPlayerStatus.Idle, async () => {
-                if(global.songList.length>0) {
-                    console.log(`Idle...`);
-                    const song = global.songList.shift();
-                    global.songcurrent = `${song}`
-                    if(global.loop==2) {
-                        global.songList.push(song)
-                    }
-                    const tracks = await ytdl.getInfo(song);
-                    const stream = await ytdl.downloadFromInfo(tracks, { filter: 'audioonly' });
-                    const resource = global.loop==1 ? audioPlayer.state.resource : createAudioResource(stream, { inputType: StreamType.Arbitrary });
-                    audioPlayer.play(resource);
-                    connection.subscribe(audioPlayer);
-                }else {
-                    console.log('Disconnect...');
-                    global.songcurrent = ``
-                    connection.disconnect()
-                }
-            });
-            audioPlayer.on('error', (error) => {
-                console.error('Error Player:', error);
-            });
-            // เมื่อเชื่อมต่อกับช่องเสียงสำเร็จ
-            await entersState(connection, VoiceConnectionStatus.Ready, 20e3);
+            await sendMusic(song, interaction);
+            isSuccess = true
         }
     }else {
         global.songList = global.songList.concat(songList)
     }
+    return isSuccess;
 }
 
 module.exports.volume = async (interaction) => {
-    let resMsg = ``;
-    const connection = getVoiceConnection(interaction.member.guild.id)
+    let resMsg = '';
+    const connection = getVoiceConnection(interaction.guildId);
     if(connection) {
-        connection.subscribe(audioPlayer);
-        // เมื่อเพลงเล่นเสร็จสิ้น หรือมีปัญหาขึ้น
-        audioPlayer.on(AudioPlayerStatus.Playing, () => {
-            console.log('Set Volume Playing...');
-            const string = interaction.options.getString("number")
-            const volume = parseInt(string)
-            if(global.songList.length==0) {
-                resMsg = `หนูไม่พบเพลงใน Queue เพิ่มเพลงก่อนนะคะ`
+        const string = interaction.options.getInteger("number")
+        const volume = parseInt(string)
+        if(global.songcurrent==``) {
+            resMsg = `หนูไม่พบเพลงใน Queue เพิ่มเพลงก่อนนะคะ`
+        }else {
+            if (isNaN(volume)) {
+                resMsg = `หนูไม่เข้าใจระดับเพลงของคุณค่ะ`
+            }else if (volume < 1) { 
+                resMsg = `ปรับระดับเสียงต่ำกว่า 1 ไม่ได้นะคะ`
+            }else if (volume > 100) {
+                resMsg = `ปรับระดับเสียงมากกว่า 100 ไม่ได้นะคะ`
             }else {
-                if (isNaN(volume)) {
-                    resMsg = `หนูไม่เข้าใจระดับเพลงของคุณค่ะ`
-                }else if (volume < 1) { 
-                    resMsg = `ปรับระดับเสียงต่ำกว่า 1 ไม่ได้นะคะ`
-                }else if (volume > 100) {
-                    resMsg = `ปรับระดับเสียงมากกว่า 100 ไม่ได้นะคะ`
-                }else {
-                    audioPlayer.setVolume(volume/100);
-                    resMsg = `ปรับระดับเสียงเรียบร้อย ระดับเสียงที่คุณเลือกคือ **${volume}**`
-                }
+                resMsg = `ปรับระดับเสียงเรียบร้อย ระดับเสียงที่คุณเลือกคือ **${volume}**`
+                global.volume = volume
+                global.connection.state.subscription.player.state.resource.volume.setVolume(volume / 100);
             }
-        });
+        }
     }else {
         resMsg = `หนูไม่พบเพลงใน Queue เพิ่มเพลงก่อนนะคะ`
     }
@@ -123,11 +93,11 @@ module.exports.volume = async (interaction) => {
 }
 
 module.exports.loop = async (interaction) => {
-    const string = interaction.options.getString("number");
+    const string = interaction.options.getInteger("number");
     let loop = parseInt(string);
     loop = (isNaN(loop)) ? 2 : loop;
     let resMsg = ``;
-    if (global.songList.length==0) {
+    if (global.songcurrent==``) {
         resMsg = `หนูไม่พบเพลงใน Queue เพิ่มเพลงก่อนนะคะ`
     }else {
         if(loop==1) {
@@ -153,20 +123,15 @@ module.exports.loop = async (interaction) => {
 
 module.exports.skip = async (interaction) => {
     let resMsg = ``;
-    if(global.songList.length>1) {
-        audioPlayer.
-        audioPlayer.on(AudioPlayerStatus.Playing, async () => {
-            console.log(`Playing...`);
-            const song = global.songList.shift();
-            if(global.loop==2) {
-                global.songList.push(song)
-            }
-            const tracks = await ytdl.getInfo(song);
-            const stream = await ytdl.downloadFromInfo(tracks, { filter: 'audioonly' });
-            const resource = global.loop==1 ? audioPlayer.state.resource : createAudioResource(stream, { inputType: StreamType.Arbitrary });
-            audioPlayer.play(resource);
-            connection.subscribe(audioPlayer);
-        })
+    const connection = getVoiceConnection(interaction.guildId);
+    if(global.songList.length>1 && connection) {
+        const song = global.songList.shift()
+        global.songcurrent = `${song}`
+        if(global.loop==2) {
+            global.songList.push(song)
+        }
+        global.connection.state.subscription.player.stop();
+        await sendMusic(song, interaction);
         resMsg = `เล่นเพลงถัดไปสำเร็จ. ${interaction.user}`
     }else {
         resMsg = `ไม่มีคิวเพลงแล้วน้าา~~. ${interaction.user}`
@@ -182,7 +147,7 @@ module.exports.skip = async (interaction) => {
 }
 
 module.exports.nowplaying = async (interaction) => {
-    if(global.songList.length>0 && global.songcurrent!=``) {
+    if(global.songcurrent!=``) {
         const tracks = await ytdl.getInfo(global.songcurrent);
         const embed = new EmbedBuilder()
                         .setColor("#C995C1")
@@ -210,20 +175,90 @@ module.exports.nowplaying = async (interaction) => {
     }
 }
 
-module.exports.disconnect = async (interaction) => {
-    const connection = getVoiceConnection(interaction.member.guild.id)
-    if(connection) {
-        const resMsg = `Sayonara craw, bye bye ${interaction.user}`
-        const embed = new EmbedBuilder()
-                            .setColor("#C995C1")
-                            .setTitle(`หนูรับทราบค่ะ`)
-                            .setDescription(`${resMsg}`)
-                            .setTimestamp()
-                            .setFooter({ text: 'Powerd be cherMew', iconURL: `https://cdn.discordapp.com/icons/${interaction.guild.id}/${interaction.guild.icon}.webp` });
-        await interaction.followUp({embeds: [embed]});
-        setTimeout(() => interaction.deleteReply(), 3000);
-        connection.destroy()
+module.exports.leave = async (interaction) => {
+    const resMsg = await disconnect(interaction)
+    const embed = new EmbedBuilder()
+                        .setColor("#C995C1")
+                        .setTitle(`หนูรับทราบค่ะ`)
+                        .setDescription(`${resMsg}`)
+                        .setTimestamp()
+                        .setFooter({ text: 'Powerd be cherMew', iconURL: `https://cdn.discordapp.com/icons/${interaction.guild.id}/${interaction.guild.icon}.webp` });
+    await interaction.followUp({embeds: [embed]});
+    setTimeout(() => interaction.deleteReply(), 3000);
+}
+
+function disconnect(interaction) {
+    if(global.connection!=null) {
+        // fs.unlink(global.filename)
+        global.connection.destroy()
+        global.loop = 0
+        global.volume = 50
         global.songList = []
         global.songcurrent = ``
+        global.connection = null
+        console.log('Disconnect...');
+        return `Sayonara craw, bye bye ${interaction.user}`
+    }else {
+        return `หนูไม่พบเพลงใน Queue เพิ่มเพลงก่อนนะคะ ${interaction.user}`
     }
+}
+
+async function sendMusic(song, interaction) {
+    // กำหนดไฟล์ที่จะเป็นไฟล์เสียงประเภท MP4 ที่จะสร้างขึ้น
+    await downloadFile(song);
+    // สร้าง AudioResource จาก URL ของเพลงที่ต้องการเล่น
+    // const tracks = await ytdl.getInfo(song);
+    // const stream = await ytdl.downloadFromInfo(tracks, { filter: 'audioonly' });
+    // let resource = createAudioResource(stream, { inputType: StreamType.Arbitrary, inlineVolume: true });
+    let resource = createAudioResource(global.filename, { inputType: StreamType.Arbitrary, inlineVolume: true });
+    resource.volume.setVolume(global.volume / 100);
+    // เล่นเพลง
+    global.audioPlayer.play(resource);
+    global.connection.subscribe(audioPlayer);
+    // เมื่อเพลงเล่นเสร็จสิ้น หรือมีปัญหาขึ้น
+    global.audioPlayer.on(AudioPlayerStatus.Playing, () => {
+        console.log('Playing...');
+    });
+    global.audioPlayer.on(AudioPlayerStatus.Idle, async () => {
+        if(global.songList.length>0) {
+            console.log(`Idle...`);
+            const song = global.songList.shift();
+            global.songcurrent = `${song}`
+            if(global.loop==2) {
+                global.songList.push(song)
+            }
+            await downloadFile(song);
+            // const tracks = await ytdl.getInfo(song);
+            // const stream = await ytdl.downloadFromInfo(tracks, { filter: 'audioonly' });
+            // let resource = global.loop==1 ? global.audioPlayer.state.resource : createAudioResource(stream, { inputType: StreamType.Arbitrary, inlineVolume: true });
+            let resource = global.loop==1 ? global.audioPlayer.state.resource : createAudioResource(global.filename, { inputType: StreamType.Arbitrary, inlineVolume: true });
+            resource.volume.setVolume(global.volume / 100);
+            global.audioPlayer.play(resource);
+            global.connection.subscribe(global.audioPlayer);
+        }else {
+            await disconnect(interaction)
+        }
+    });
+    global.audioPlayer.on('error', (error) => {
+        console.error('Error Player:', error);
+    });
+    // เมื่อเชื่อมต่อกับช่องเสียงสำเร็จ
+    await entersState(global.connection, VoiceConnectionStatus.Ready, 20e3);
+}
+
+async function downloadFile(song) {
+    // if (fs.existsSync(global.filename)) {
+    //     fs.unlink(global.filename)
+    // }
+    const info = await ytdl.getInfo(song)
+    const videoFormat = ytdl.chooseFormat(info.formats, { quality: 'highest' });
+    const options = {
+        format: videoFormat,
+    };
+    const videoStream = await ytdl.downloadFromInfo(info, options);
+    const fileStream = await fs.createWriteStream(global.filename);
+    await videoStream.pipe(fileStream);
+    await fileStream.on('finish', async () => {
+        console.log(`Video downloaded successfully as ${global.filename}`);
+    })
 }

@@ -56,7 +56,7 @@ for (const file of eventFiles) {
 }
 
 bot.on(Events.InteractionCreate, async interaction => {
-	console.log('interaction', interaction);
+	// console.log('interaction', interaction);
 	if (!interaction.isChatInputCommand()) return;
     const command = bot.commands.get(interaction.commandName);
 	if (!command) {
