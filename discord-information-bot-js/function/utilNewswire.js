@@ -12,10 +12,10 @@ const URL_GET_LASTED_VIDEO_CGM48 = `https://www.googleapis.com/youtube/v3/search
 const URL_GET_LASTED_VIDEO_UP2MEW = `https://www.googleapis.com/youtube/v3/search?key=${process.env.API_KEY}&channelId=${process.env.UP2MEW_YOUTUBE_CHANNEL_ID}&part=snippet,id&order=date&maxResults=50`;
 
 module.exports.prepareChannel = async (bot) => {
-    let category = await bot.channels.cache.find(c => c.type === 4 && c.name === process.env.CAT_JOINANDLEAVE)
+    let category = await bot.channels.cache.find(c => c.type === 4 && c.name === process.env.CAT_NEWSWIRE)
     if(category==undefined) {
         category = await bot.channels.create({
-            name: `${process.env.CAT_JOINANDLEAVE}`,
+            name: `${process.env.CAT_NEWSWIRE}`,
             type: 4
         });
     }
