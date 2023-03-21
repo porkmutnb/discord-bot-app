@@ -12,6 +12,7 @@
     "@iamtraction/google-translate": "^2.0.1",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
+    "googleapis": "^113.0.0",
     "nodemon": "^2.0.20",
     "openai": "^3.1.0"
   }
