@@ -19,7 +19,9 @@ module.exports.getDataFoodsList = async () => {
         });
         const rows = response.data.values;
         await rows.forEach(element => {
-            itemList.push(element[0]);
+            if(element[0]!=undefined && element[0]!=``) {
+                itemList.push(element[0]);
+            }
         })
     } catch (error) {
         console.error(error);
