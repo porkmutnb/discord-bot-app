@@ -31,6 +31,8 @@ module.exports = {
                                 .setFooter({ text: 'Powerd be cherMew', iconURL: `https://cdn.discordapp.com/icons/${interaction.guild.id}/${interaction.guild.icon}.webp` });
                 await interaction.followUp({embeds: [embed]});
                 setTimeout(() => interaction.deleteReply(), 10000);
+            }else {
+                
             }
         }else {
             const embed = new EmbedBuilder()

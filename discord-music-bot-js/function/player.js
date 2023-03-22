@@ -1,11 +1,16 @@
 const { EmbedBuilder } = require('discord.js');
 const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, entersState, NoSubscriberBehavior , StreamType, AudioPlayerStatus, VoiceConnectionStatus } = require('@discordjs/voice')
+const { createReadStream } = require('node:fs')
+const ffmpeg = require('ffmpeg-static')
+const cp = require('child_process')
+const path = require('node:path')
 const ytdl = require('ytdl-core')
-const ffmpeg = require('ffmpeg')
+//const ffmpeg = require('ffmpeg')
 require('dotenv').config()
 const fs = require('fs')
 
-global.filename = 'video.mp4'
+global.videofilename = 'video.mp4'
+global.audiofilename = 'audio.mp3'
 global.connection = null
 global.audioPlayer = createAudioPlayer()
 global.songcurrent = ``
@@ -205,12 +210,16 @@ function disconnect(interaction) {
 
 async function sendMusic(song, interaction) {
     // กำหนดไฟล์ที่จะเป็นไฟล์เสียงประเภท MP4 ที่จะสร้างขึ้น
-    await downloadFile(song);
+    // await downloadFile(song);
     // สร้าง AudioResource จาก URL ของเพลงที่ต้องการเล่น
-    // const tracks = await ytdl.getInfo(song);
-    // const stream = await ytdl.downloadFromInfo(tracks, { filter: 'audioonly' });
-    // let resource = createAudioResource(stream, { inputType: StreamType.Arbitrary, inlineVolume: true });
-    let resource = createAudioResource(global.filename, { inputType: StreamType.Arbitrary, inlineVolume: true });
+    const tracks = await ytdl.getInfo(song);
+    const stream = await ytdl.downloadFromInfo(tracks, { filter: 'audioonly' });
+    let resource = createAudioResource(stream, { inputType: StreamType.Arbitrary, inlineVolume: true });
+    // const videoFilePath = path.join(__dirname, '/../'+global.videofilename);
+    // console.log('videoFilePath', videoFilePath);
+    // const audioFilePath = path.join(__dirname, '/../'+global.audiofilename);
+    // console.log('audioFilePath', audioFilePath);
+    // let resource = createAudioResource(createReadStream(audioFilePath), { inputType: StreamType.WebmOpus, inlineVolume: true });
     resource.volume.setVolume(global.volume / 100);
     // เล่นเพลง
     global.audioPlayer.play(resource);
@@ -227,11 +236,11 @@ async function sendMusic(song, interaction) {
             if(global.loop==2) {
                 global.songList.push(song)
             }
-            await downloadFile(song);
-            // const tracks = await ytdl.getInfo(song);
-            // const stream = await ytdl.downloadFromInfo(tracks, { filter: 'audioonly' });
-            // let resource = global.loop==1 ? global.audioPlayer.state.resource : createAudioResource(stream, { inputType: StreamType.Arbitrary, inlineVolume: true });
-            let resource = global.loop==1 ? global.audioPlayer.state.resource : createAudioResource(global.filename, { inputType: StreamType.Arbitrary, inlineVolume: true });
+            // await downloadFile(song);
+            const tracks = await ytdl.getInfo(song);
+            const stream = await ytdl.downloadFromInfo(tracks, { filter: 'audioonly' });
+            let resource = global.loop==1 ? global.audioPlayer.state.resource : createAudioResource(stream, { inputType: StreamType.Arbitrary, inlineVolume: true });
+            // let resource = global.loop==1 ? global.audioPlayer.state.resource : createAudioResource(createReadStream(audioFilePath), { inputType: StreamType.WebmOpus, inlineVolume: true });
             resource.volume.setVolume(global.volume / 100);
             global.audioPlayer.play(resource);
             global.connection.subscribe(global.audioPlayer);
@@ -247,18 +256,34 @@ async function sendMusic(song, interaction) {
 }
 
 async function downloadFile(song) {
-    // if (fs.existsSync(global.filename)) {
-    //     fs.unlink(global.filename)
-    // }
-    const info = await ytdl.getInfo(song)
-    const videoFormat = ytdl.chooseFormat(info.formats, { quality: 'highest' });
-    const options = {
-        format: videoFormat,
-    };
-    const videoStream = await ytdl.downloadFromInfo(info, options);
-    const fileStream = await fs.createWriteStream(global.filename);
-    await videoStream.pipe(fileStream);
-    await fileStream.on('finish', async () => {
-        console.log(`Video downloaded successfully as ${global.filename}`);
+    return new Promise(async resolve => {
+        // if (fs.existsSync(global.videofilename)) {
+        //     fs.unlink(global.videofilename)
+        // }
+        const info = await ytdl.getInfo(song)
+        const videoFormat = ytdl.chooseFormat(info.formats, { quality: 'highest' });
+        const options = {
+            format: videoFormat,
+        };
+        ytdl.downloadFromInfo(info, options).pipe(fs.createWriteStream(global.videofilename)).on('finish', () => {
+            console.log(`Video downloaded successfully as ${global.videofilename}`);
+            const command = `${ffmpeg} -i ${global.videofilename} -vn -ar 44100 -ac 2 -ab 192k -f mp3 ${global.audiofilename}`;
+            cp.exec(command, (err, stdout, stderr) => {
+                if (err) {
+                    console.error('Error occurred while converting video to audio', err);
+                    resolve('error')
+                }
+                console.log(`Audio converted successfully as ${global.audiofilename}`);
+                resolve('success')
+            });
+        })
+
+        // const videoStream = await ytdl.downloadFromInfo(info, options);
+        // const fileStream = await fs.createWriteStream(global.videofilename);
+        // await videoStream.pipe(fileStream);
+        // await fileStream.on('finish', async () => {
+        //     console.log(`Video downloaded successfully as ${global.videofilename}`);
+        //     resolve('success')
+        // })
     })
 }

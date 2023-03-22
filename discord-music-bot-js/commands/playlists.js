@@ -27,8 +27,12 @@ module.exports = {
             const name = interaction.options.getString('name') || `cherMew`;
             const songList = await getDataSongList(name);
             if(songList.length>0) {
-                await play(interaction, songList)
-                resMsg = `Add Song ${songList.length} Queue Successfully`
+                const isSuccess = await play(interaction, songList)
+                if(isSuccess) {
+                    resMsg = `Add Song ${songList.length} Queue Successfully`
+                }else {
+                    return;
+                }
             }else {
                 resMsg = `ไม่พบเพลงใน template name ${name}`
             }
