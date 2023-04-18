@@ -16,6 +16,7 @@ module.exports = {
 						{ name: '/hi', value: 'คุยกับหนู', inline: true },
 						{ name: '/imagine', value: 'อยากได้ภาพอะไรบอกหนูสิ', inline: true },
 						{ name: '/translate', value: `อยากได้ล่ามภาษามั้ยคะ`, inline: true },
+						{ name: '/foods', value: `ให้หนูเลือกมื้อเที่ยงให้มั้ยคะ`, inline: true },
 						{ name: '/setup', value: `Command for me`, inline: false }
 					)
 					.setImage(`https://i.pinimg.com/originals/89/80/aa/8980aad5866ff9d7d8c42280a0e58d52.gif`)
