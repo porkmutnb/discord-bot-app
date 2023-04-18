@@ -14,3 +14,6 @@ docker build -t [discord-bot] .
 docker run --name [discord-bot] -d -p [portIn:portOut] [discord-bot]
 
 docker image ls
+
+** if can not build to docker **
+sudo docker system prune -a
